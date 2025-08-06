@@ -17,3 +17,4 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_PSIKOTESMANDIRI }}
           channelId: live
           projectId: psikotesmandiri
+          entryPoint: ./APLIKASI TES PSIKOLOGI
