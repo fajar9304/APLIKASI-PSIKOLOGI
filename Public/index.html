@@ -985,7 +985,7 @@
         app.test.callGeminiAPI = async (prompt, results, callback) => {
             // GANTI DENGAN API KEY ANDA DI SINI
             const apiKey = "AIzaSyBGR72HYabTI1UqR-hXWMuAWaZe4KHTDsM"; 
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.0-pro:generateContent?key=${apiKey}`;
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey};
             
             const payload = {
                 contents: [{ parts: [{ text: prompt }] }]
