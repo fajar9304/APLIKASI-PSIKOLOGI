@@ -15,13 +15,9 @@
         .active-screen { display: block; }
         .card-hover-effect { transition: transform 0.3s ease, box-shadow 0.3s ease; }
         .card-hover-effect:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); }
-        .test-card.completed { background-color: #f0fdf4; border: 1px solid #16a34a; }
-        #selection-modal, #bundle-modal { background-color: rgba(0, 0, 0, 0.5); }
-        .admin-input { width: 100%; border: 1px solid #d1d5db; border-radius: 0.375rem; padding: 0.25rem 0.5rem; font-size: 0.875rem; }
         .prose h3 { font-weight: 700; font-size: 1.25rem; margin-top: 1.5em; margin-bottom: 0.75em; padding-bottom: 0.25em; border-bottom: 1px solid #e5e7eb; }
         .prose ul { list-style-type: disc; margin-left: 1.5em; }
         .prose li { margin-bottom: 0.5em; }
-        .prose strong { font-weight: 600; }
         .radio-custom { display: none; }
         .radio-label { display: inline-block; padding: 0.5rem 1rem; border: 2px solid #e2e8f0; border-radius: 9999px; cursor: pointer; transition: all 0.2s ease-in-out; font-weight: 500; }
         input.radio-m:checked + .radio-label { background-color: #16a34a; color: white; border-color: #16a34a; }
@@ -41,137 +37,7 @@
 <body class="bg-gray-50 text-gray-800">
 
     <div id="app-container" class="max-w-4xl mx-auto p-4 md:p-8">
-
-        <!-- ===== Layar Login (dari Cangkang) ===== -->
-        <div id="login-screen" class="screen active-screen">
-            <div class="bg-white p-8 rounded-xl shadow-lg max-w-md mx-auto">
-                <div class="text-center mb-8">
-                    <i class="fas fa-brain text-5xl text-indigo-500 mb-4"></i>
-                    <h1 class="text-3xl font-bold text-gray-900">Selamat Datang</h1>
-                    <p class="text-gray-600 mt-2">Masukkan nama dan token akses Anda untuk memulai.</p>
-                </div>
-                <div class="space-y-4">
-                    <div>
-                        <label for="name-input" class="block text-sm font-medium text-gray-700">Nama Lengkap</label>
-                        <input type="text" id="name-input" placeholder="Masukkan nama lengkap Anda" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                    </div>
-                     <div>
-                        <label for="token-input" class="block text-sm font-medium text-gray-700">Token Akses</label>
-                        <input type="tel" id="token-input" placeholder="Masukkan 6 digit token" maxlength="6" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                    </div>
-                    <button id="login-btn" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300">Mulai Sesi</button>
-                    <p id="auth-feedback" class="text-center text-sm text-red-600 h-4"></p>
-                </div>
-            </div>
-        </div>
-
-        <!-- ===== KONTEN APLIKASI TES PENGGUNA DIMULAI DI SINI ===== -->
-
-        <!-- ===== Layar Dashboard (Layar Awal Aplikasi Tes) ===== -->
-        <div id="dashboard-screen" class="screen">
-             <div class="bg-white p-6 rounded-xl shadow-lg mb-8 flex justify-between items-center">
-                <div class="flex items-center">
-                    <i class="fas fa-brain text-4xl text-indigo-500 mr-5"></i>
-                    <div>
-                        <h1 class="text-2xl font-bold text-gray-900 mb-1">Halo, <span id="user-name-display">Pengguna</span>!</h1>
-                        <p class="text-gray-600">Temukan kekuatan Anda. Pilih tes di bawah ini untuk memulai.</p>
-                    </div>
-                </div>
-                <button id="logout-btn" class="bg-red-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-600 transition text-sm">
-                    <i class="fas fa-sign-out-alt mr-2"></i>Keluar
-                </button>
-            </div>
-            <div id="test-dashboard-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-        </div>
-        
-        <!-- ===== Layar Mulai Tes (Instruksi & Timer) ===== -->
-        <div id="start-test-screen" class="screen">
-            <div class="bg-white p-8 rounded-xl shadow-lg text-center">
-                <h2 id="start-test-title" class="text-3xl font-bold text-gray-900 mb-4"></h2>
-                <div class="bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 p-4 mb-6 rounded-r-lg text-left">
-                    <p class="font-bold mb-2">Instruksi Penting:</p>
-                    <p id="start-test-instructions"></p>
-                </div>
-                <div class="flex justify-center items-center text-lg text-gray-700 mb-8">
-                    <i class="far fa-clock mr-3 text-2xl"></i>
-                    <div>
-                        <p>Waktu Pengerjaan:</p>
-                        <p id="start-test-time" class="font-bold text-2xl text-indigo-600"></p>
-                    </div>
-                </div>
-                <button id="start-test-button" class="w-full max-w-sm mx-auto bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-indigo-700 transition duration-300">
-                    Mulai Pengerjaan
-                </button>
-                <button onclick="app.ui.showScreen('dashboard-screen')" class="w-full mt-3 text-sm text-gray-500 hover:underline">Kembali ke Dashboard</button>
-            </div>
-        </div>
-
-        <!-- ===== Layar Pengerjaan Tes, Hasil, Latihan (Struktur tidak berubah) ===== -->
-        <div id="test-screen" class="screen">
-             <div class="bg-white p-4 rounded-xl shadow-md mb-6 flex justify-between items-center sticky top-4 z-10">
-                <button onclick="app.ui.showScreen('dashboard-screen')" class="text-indigo-600 hover:text-indigo-800 text-sm"><i class="fas fa-arrow-left mr-2"></i>Kembali</button>
-                <div id="timer-display" class="font-bold text-xl text-red-600 bg-red-100 px-4 py-2 rounded-full">
-                    <i class="far fa-clock mr-2"></i>
-                    <span id="time-remaining">00:00</span>
-                </div>
-            </div>
-            <div class="bg-white p-8 rounded-xl shadow-lg">
-                <h2 id="test-title" class="text-2xl font-bold mb-2 text-center"></h2>
-                <p id="test-section-title" class="text-center text-gray-500 mb-6"></p>
-                <div id="question-container"></div>
-                <div id="navigation-container" class="flex justify-between items-center mt-8">
-                    <button id="prev-btn" class="bg-gray-200 text-gray-700 font-bold py-2 px-6 rounded-full hover:bg-gray-300 transition duration-300">
-                        Sebelumnya
-                    </button>
-                    <div id="progress-text" class="text-sm text-gray-500"></div>
-                    <button id="next-btn" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-full hover:bg-blue-700 transition duration-300">
-                        Berikutnya
-                    </button>
-                    <button id="submit-btn" class="hidden w-full bg-green-600 text-white font-bold py-3 px-4 rounded-full hover:bg-green-700 transition duration-300 transform hover:scale-105">
-                        Lihat Hasil Tes
-                    </button>
-                </div>
-            </div>
-        </div>
-        <div id="review-screen" class="screen">
-            <div class="bg-white p-8 rounded-xl shadow-lg">
-                <h2 class="text-2xl font-bold mb-6 text-center">Tinjau Jawaban Anda</h2>
-                <p class="text-center text-gray-600 mb-6">Pastikan semua jawaban sudah sesuai sebelum dianalisis. Anda dapat mengklik "Edit" untuk mengubah jawaban.</p>
-                <div id="review-container" class="space-y-4 max-h-96 overflow-y-auto pr-4"></div>
-                <div class="flex gap-4 mt-8">
-                    <button onclick="app.ui.showScreen('dashboard-screen')" class="w-full bg-gray-200 text-gray-800 font-bold py-3 rounded-lg hover:bg-gray-300 transition">Batalkan</button>
-                    <button onclick="app.test.confirmAndAnalyze()" class="w-full bg-green-600 text-white font-bold py-3 rounded-lg hover:bg-green-700 transition">Konfirmasi & Analisa Jawaban Saya</button>
-                </div>
-            </div>
-        </div>
-        <div id="results-screen" class="screen">
-             <button onclick="app.ui.showScreen('dashboard-screen')" class="mb-6 text-indigo-600 hover:text-indigo-800"><i class="fas fa-arrow-left mr-2"></i>Kembali ke Dashboard</button>
-            <div id="loading-indicator" class="text-center p-8">
-                <i class="fas fa-spinner fa-spin text-4xl text-indigo-500"></i>
-                <p class="mt-4 text-gray-600">Kami sedang menganalisa jawaban Anda...</p>
-            </div>
-            <div id="results-content" class="bg-white p-8 rounded-xl shadow-lg hidden"></div>
-        </div>
-        
-        <!-- ===== Layar Rekomendasi Karir ===== -->
-        <div id="career-reco-screen" class="screen">
-            <button onclick="app.ui.showScreen('dashboard-screen')" class="mb-6 text-indigo-600 hover:text-indigo-800"><i class="fas fa-arrow-left mr-2"></i>Kembali ke Dashboard</button>
-            <div id="career-loading-indicator" class="text-center p-8">
-                <i class="fas fa-spinner fa-spin text-4xl text-indigo-500"></i>
-                <p class="mt-4 text-gray-600">Menganalisis profil Anda untuk rekomendasi karir...</p>
-            </div>
-            <div id="career-content" class="bg-white p-8 rounded-xl shadow-lg hidden"></div>
-        </div>
-        
-        <!-- ===== Layar Rekomendasi Karakter Pasangan ===== -->
-        <div id="romance-reco-screen" class="screen">
-            <button onclick="app.ui.showScreen('dashboard-screen')" class="mb-6 text-indigo-600 hover:text-indigo-800"><i class="fas fa-arrow-left mr-2"></i>Kembali ke Dashboard</button>
-            <div id="romance-loading-indicator" class="text-center p-8">
-                <i class="fas fa-spinner fa-spin text-4xl text-pink-500"></i>
-                <p class="mt-4 text-gray-600">Menganalisis profil Anda untuk rekomendasi karakter pasangan...</p>
-            </div>
-            <div id="romance-content" class="bg-white p-8 rounded-xl shadow-lg hidden"></div>
-        </div>
+        <!-- Konten akan dirender oleh JavaScript -->
     </div>
     
     <!-- ===== Template Sertifikat (Hidden) ===== -->
@@ -197,9 +63,7 @@
             <div class="flex items-end justify-between">
                 <div class="w-2/3 pr-8">
                     <h3 class="text-xl font-bold text-gray-800 mb-3">Rangkuman Hasil</h3>
-                    <div id="cert-scores" class="space-y-2">
-                        <!-- Skor akan di-generate di sini -->
-                    </div>
+                    <div id="cert-scores" class="space-y-2"></div>
                 </div>
                 <div class="text-center">
                     <img id="cert-qr-code" src="" alt="QR Code Validasi" crossorigin="anonymous">
@@ -219,9 +83,6 @@
 
 
     <script type="module">
-        // =======================================================
-        // BAGIAN 1: SISTEM LOGIN & OTORISASI (CANGKANG)
-        // =======================================================
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInAnonymously, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -235,32 +96,56 @@
             appId: "1:460185667869:web:ad932625381c50c17e39f4"
         };
 
-        // Main application object
         window.app = {
             services: {},
-            state: {
-                currentUser: null,
-            },
-            // Initialize the entire application
+            state: { currentUser: null },
             init() {
                 const firebaseApp = initializeApp(firebaseConfig);
                 app.services.auth = getAuth(firebaseApp);
                 app.services.db = getFirestore(firebaseApp);
                 app.auth.setupListeners();
+                app.ui.renderInitialUI();
                 app.ui.setupListeners();
             },
             auth: {}, 
             ui: {},
-            test: {} // Namespace for the test application logic
+            test: {}
         };
 
-        // --- UI FUNCTIONS ---
+        app.ui.renderInitialUI = () => {
+            const container = document.getElementById('app-container');
+            container.innerHTML = `
+                <div id="login-screen" class="screen">
+                    <div class="bg-white p-8 rounded-xl shadow-lg max-w-md mx-auto">
+                        <div class="text-center mb-8"><i class="fas fa-brain text-5xl text-indigo-500 mb-4"></i><h1 class="text-3xl font-bold text-gray-900">Selamat Datang</h1><p class="text-gray-600 mt-2">Masukkan nama dan token akses Anda untuk memulai.</p></div>
+                        <div class="space-y-4">
+                            <div><label for="name-input" class="block text-sm font-medium text-gray-700">Nama Lengkap</label><input type="text" id="name-input" placeholder="Masukkan nama lengkap Anda" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"></div>
+                            <div><label for="token-input" class="block text-sm font-medium text-gray-700">Token Akses</label><input type="tel" id="token-input" placeholder="Masukkan 6 digit token" maxlength="6" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"></div>
+                            <button id="login-btn" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300">Mulai Sesi</button>
+                            <p id="auth-feedback" class="text-center text-sm text-red-600 h-4"></p>
+                        </div>
+                    </div>
+                </div>
+                <div id="dashboard-screen" class="screen"></div>
+                <div id="start-test-screen" class="screen"></div>
+                <div id="test-screen" class="screen"></div>
+                <div id="results-screen" class="screen"></div>
+                <div id="career-reco-screen" class="screen"></div>
+                <div id="romance-reco-screen" class="screen"></div>
+            `;
+        };
+
         app.ui.setupListeners = () => {
-            document.getElementById('login-btn').addEventListener('click', app.auth.handleLogin);
-            document.getElementById('logout-btn').addEventListener('click', app.auth.handleLogout);
-            document.getElementById('prev-btn').addEventListener('click', () => app.test.prevQuestion());
-            document.getElementById('next-btn').addEventListener('click', () => app.test.nextQuestion());
-            document.getElementById('submit-btn').addEventListener('click', () => app.test.submitTest());
+            document.getElementById('app-container').addEventListener('click', (e) => {
+                if (e.target.id === 'login-btn') app.auth.handleLogin();
+                if (e.target.id === 'logout-btn') app.auth.handleLogout();
+                if (e.target.id === 'start-test-button') app.test.beginActualTest();
+                if (e.target.closest('#prev-btn')) app.test.prevQuestion();
+                if (e.target.closest('#next-btn')) app.test.nextQuestion();
+                if (e.target.closest('#submit-btn')) app.test.submitTest();
+                if (e.target.closest('.back-to-dashboard')) app.ui.showScreen('dashboard-screen');
+                if (e.target.closest('.confirm-analyze-btn')) app.test.confirmAndAnalyze();
+            });
             document.getElementById('custom-alert-close').addEventListener('click', () => app.ui.hideCustomAlert());
         };
 
@@ -268,11 +153,7 @@
             document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active-screen'));
             const screenEl = document.getElementById(screenId);
             if(screenEl) screenEl.classList.add('active-screen');
-            
-            if (app.test.state && app.test.state.memoryTestInterval) clearInterval(app.test.state.memoryTestInterval);
-            if (screenId !== 'test-screen' && app.test.state && app.test.state.testTimerInterval) {
-                clearInterval(app.test.state.testTimerInterval);
-            }
+            if (app.test.state && app.test.state.testTimerInterval) clearInterval(app.test.state.testTimerInterval);
         };
         
         app.ui.showCustomAlert = (message) => {
@@ -280,18 +161,15 @@
             document.getElementById('custom-alert').classList.add('visible');
         };
 
-        app.ui.hideCustomAlert = () => {
-            document.getElementById('custom-alert').classList.remove('visible');
-        };
+        app.ui.hideCustomAlert = () => document.getElementById('custom-alert').classList.remove('visible');
 
-        // --- AUTHENTICATION FUNCTIONS ---
         app.auth.setupListeners = () => {
             onAuthStateChanged(app.services.auth, (user) => {
                 const sessionName = sessionStorage.getItem('userName');
                 if (user && sessionName) {
                     if (!app.state.currentUser || app.state.currentUser.uid !== user.uid) {
                         app.state.currentUser = { name: sessionName, uid: user.uid };
-                        app.auth.startTestApplication();
+                        app.test.init(app.state.currentUser.name);
                     }
                 } else {
                     app.auth.clearSession();
@@ -299,12 +177,6 @@
             });
         };
         
-        app.auth.startTestApplication = () => {
-            if (!app.state.currentUser) return;
-            // Initialize the test application with the logged-in user's name
-            app.test.init(app.state.currentUser.name);
-        };
-
         app.auth.clearSession = () => {
             if (app.services.auth.currentUser) signOut(app.services.auth);
             app.state.currentUser = null;
@@ -331,7 +203,6 @@
                 
                 sessionStorage.setItem('userName', name);
                 await signInAnonymously(app.services.auth);
-                // onAuthStateChanged will handle the rest
             } catch (error) {
                 console.error("Token Login Error:", error);
                 feedbackEl.textContent = error.message;
@@ -340,25 +211,11 @@
             }
         };
 
-        app.auth.handleLogout = () => {
-            signOut(app.services.auth);
-        };
+        app.auth.handleLogout = () => signOut(app.services.auth);
 
-        // =======================================================
-        // BAGIAN 2: LOGIKA APLIKASI TES
-        // =======================================================
-
-        // --- Test Application State & Data ---
         app.test.state = {
-            currentUser: 'Pengguna',
-            currentTest: null,
-            currentQuestionIndex: 0,
-            userAnswers: {},
-            savedResults: {},
-            memoryTestInterval: null,
-            testTimerInterval: null,
-            riasecCurrentPage: 1,
-            riasecQuestionsPerPage: 3,
+            currentUser: 'Pengguna', currentTest: null, currentQuestionIndex: 0, userAnswers: {},
+            savedResults: {}, testTimerInterval: null, riasecCurrentPage: 1, riasecQuestionsPerPage: 3,
         };
 
         app.test.data = {
@@ -369,7 +226,7 @@
                 'DISC': { title: 'Tes Perilaku (DISC)', icon: 'fa-comments', color: 'text-teal-500', description: 'Pahami gaya perilaku & komunikasi.', premiumKey: 'DISC Premium' },
                 'Minat Bakat': { title: 'Tes Minat Bakat (RIASEC)', icon: 'fa-compass', color: 'text-sky-500', description: 'Temukan minat karir sejati Anda.', premiumKey: 'Minat Bakat Premium'}
             },
-            questions: { /* This will be populated from defaultTestsData */ }
+            questions: { /* Populated from defaultTestsData */ }
         };
 
         app.test.defaultTestsData = {
@@ -494,8 +351,6 @@
             }
         };
 
-        // --- Test Application Main Functions ---
-        
         app.test.init = (userName) => {
             app.test.state.currentUser = userName;
             document.getElementById('user-name-display').textContent = app.test.state.currentUser;
@@ -505,52 +360,72 @@
         };
 
         app.test.updateDashboard = () => {
-            const grid = document.getElementById('test-dashboard-grid');
-            grid.innerHTML = '';
+            const dashboardScreen = document.getElementById('dashboard-screen');
+            let cardsHTML = '';
             for (const testKey in app.test.data.allTests) {
                 const testInfo = app.test.data.allTests[testKey];
-                const card = document.createElement('div');
-                card.className = 'test-card bg-white p-6 rounded-xl shadow-md card-hover-effect cursor-pointer';
+                const isCompleted = app.test.state.savedResults[testInfo.premiumKey];
+                const completedClass = isCompleted ? 'bg-green-50 border-green-600' : 'bg-white';
+                const statusHTML = isCompleted ? `<span class="bg-violet-200 text-violet-800 text-xs font-bold px-2.5 py-0.5 rounded-full"><i class="fas fa-star mr-1"></i>Selesai</span>` : '';
                 
-                const isPremiumCompleted = app.test.state.savedResults[testInfo.premiumKey];
-                
-                let statusHTML = '';
-                if (isPremiumCompleted) {
-                    card.classList.add('completed');
-                    statusHTML = `<span class="bg-violet-200 text-violet-800 text-xs font-bold px-2.5 py-0.5 rounded-full"><i class="fas fa-star mr-1"></i>Selesai</span>`;
-                }
-
-                card.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <i class="fas ${testInfo.icon} text-3xl ${testInfo.color} mb-3"></i>
-                        ${statusHTML}
+                cardsHTML += `
+                    <div data-testid="${testInfo.premiumKey}" class="test-card ${completedClass} p-6 rounded-xl shadow-md card-hover-effect cursor-pointer">
+                        <div class="flex justify-between items-start">
+                            <i class="fas ${testInfo.icon} text-3xl ${testInfo.color} mb-3"></i>
+                            ${statusHTML}
+                        </div>
+                        <h3 class="font-bold text-lg">${testInfo.title}</h3>
+                        <p class="text-sm text-gray-500">${testInfo.description}</p>
                     </div>
-                    <h3 class="font-bold text-lg">${testInfo.title}</h3>
-                    <p class="text-sm text-gray-500">${testInfo.description}</p>
                 `;
-                
-                if (isPremiumCompleted) {
-                    card.onclick = () => app.test.viewResult(testInfo.premiumKey);
-                } else {
-                    card.onclick = () => app.test.startTest(testInfo.premiumKey);
-                }
-                grid.appendChild(card);
             }
-            
-            const careerCard = document.createElement('div');
-            careerCard.className = 'bg-white p-6 rounded-xl shadow-md card-hover-effect cursor-pointer border-2 border-dashed border-indigo-300';
-            careerCard.innerHTML = `<i class="fas fa-briefcase text-3xl text-indigo-500 mb-3"></i><h3 class="font-bold text-lg">Rekomendasi Karir</h3><p class="text-sm text-gray-500">Dapatkan saran karir personal.</p>`;
-            careerCard.onclick = app.test.showCareerRecommendation;
-            grid.appendChild(careerCard);
 
-            const romanceCard = document.createElement('div');
-            romanceCard.className = 'bg-white p-6 rounded-xl shadow-md card-hover-effect cursor-pointer border-2 border-dashed border-pink-300';
-            romanceCard.innerHTML = `<i class="fas fa-heart text-3xl text-pink-500 mb-3"></i><h3 class="font-bold text-lg">Rekomendasi Pasangan</h3><p class="text-sm text-gray-500">Temukan tipe pasangan yang cocok.</p>`;
-            romanceCard.onclick = app.test.showRomanceRecommendation;
-            grid.appendChild(romanceCard);
+            cardsHTML += `
+                <div data-testid="career-reco" class="bg-white p-6 rounded-xl shadow-md card-hover-effect cursor-pointer border-2 border-dashed border-indigo-300">
+                    <i class="fas fa-briefcase text-3xl text-indigo-500 mb-3"></i><h3 class="font-bold text-lg">Rekomendasi Karir</h3><p class="text-sm text-gray-500">Dapatkan saran karir personal.</p>
+                </div>
+                <div data-testid="romance-reco" class="bg-white p-6 rounded-xl shadow-md card-hover-effect cursor-pointer border-2 border-dashed border-pink-300">
+                    <i class="fas fa-heart text-3xl text-pink-500 mb-3"></i><h3 class="font-bold text-lg">Rekomendasi Pasangan</h3><p class="text-sm text-gray-500">Temukan tipe pasangan yang cocok.</p>
+                </div>
+            `;
+
+            dashboardScreen.innerHTML = `
+                <div class="bg-white p-6 rounded-xl shadow-lg mb-8 flex flex-col sm:flex-row justify-between items-center text-center sm:text-left">
+                    <div class="flex items-center mb-4 sm:mb-0">
+                        <i class="fas fa-brain text-4xl text-indigo-500 mr-5"></i>
+                        <div>
+                            <h1 class="text-2xl font-bold text-gray-900 mb-1">Halo, <span id="user-name-display">${app.test.state.currentUser}</span>!</h1>
+                            <p class="text-gray-600">Temukan kekuatan Anda. Pilih tes di bawah ini untuk memulai.</p>
+                        </div>
+                    </div>
+                    <button id="logout-btn" class="bg-red-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-600 transition text-sm w-full sm:w-auto">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Keluar
+                    </button>
+                </div>
+                <div id="test-dashboard-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">${cardsHTML}</div>
+            `;
+            
+            dashboardScreen.querySelector('#test-dashboard-grid').addEventListener('click', (e) => {
+                const card = e.target.closest('.test-card');
+                if (card) {
+                    const testId = card.dataset.testid;
+                    if (app.test.state.savedResults[testId]) {
+                        app.test.viewResult(testId);
+                    } else {
+                        app.test.startTest(testId);
+                    }
+                } else {
+                    const careerCard = e.target.closest('[data-testid="career-reco"]');
+                    if (careerCard) app.test.showCareerRecommendation();
+                    
+                    const romanceCard = e.target.closest('[data-testid="romance-reco"]');
+                    if (romanceCard) app.test.showRomanceRecommendation();
+                }
+            });
         };
         
         app.test.startTest = (testKey) => {
+            app.test.state.currentTestKey = testKey;
             app.test.state.currentTest = { name: testKey, ...app.test.data.questions[testKey] };
             app.test.state.userAnswers = {};
             app.test.state.currentQuestionIndex = 0;
@@ -561,25 +436,46 @@
                     .sort(() => Math.random() - 0.5);
             }
 
-            document.getElementById('start-test-title').textContent = app.test.state.currentTest.title;
             const timeInSeconds = app.test.data.timerConfigs[testKey];
-            document.getElementById('start-test-time').textContent = `${timeInSeconds / 60} Menit`;
-            
             let instructions = '';
             if (testKey === 'Tes Komprehensif Premium') instructions = 'Anda akan dihadapkan pada serangkaian pernyataan. Pilihlah jawaban yang paling sesuai dengan diri Anda. Tidak ada jawaban benar atau salah.';
             else if (testKey === 'Kognitif Premium') instructions = 'Tes ini mengukur berbagai kemampuan kognitif. Kerjakan dengan cepat dan teliti. Perhatikan setiap instruksi per bagian.';
             else if (testKey === 'DISC Premium') instructions = 'Anda akan melihat kelompok-kelompok pernyataan. Di setiap kelompok, pilih satu yang PALING menggambarkan Anda dan satu yang KURANG menggambarkan Anda.';
             else if (testKey === 'Minat Bakat Premium') instructions = 'Pilih "Suka" atau "Tidak Suka" untuk setiap kegiatan yang disajikan. Jawablah dengan jujur sesuai dengan minat Anda yang sesungguhnya.';
-            document.getElementById('start-test-instructions').textContent = instructions;
-
-            document.getElementById('start-test-button').onclick = () => app.test.beginActualTest(testKey);
+            
+            const startScreen = document.getElementById('start-test-screen');
+            startScreen.innerHTML = `
+                <div class="bg-white p-8 rounded-xl shadow-lg text-center">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-4">${app.test.state.currentTest.title}</h2>
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 p-4 mb-6 rounded-r-lg text-left"><p class="font-bold mb-2">Instruksi Penting:</p><p>${instructions}</p></div>
+                    <div class="flex justify-center items-center text-lg text-gray-700 mb-8"><i class="far fa-clock mr-3 text-2xl"></i><div><p>Waktu Pengerjaan:</p><p class="font-bold text-2xl text-indigo-600">${timeInSeconds / 60} Menit</p></div></div>
+                    <button id="start-test-button" class="w-full max-w-sm mx-auto bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-indigo-700 transition duration-300">Mulai Pengerjaan</button>
+                    <button class="back-to-dashboard w-full mt-3 text-sm text-gray-500 hover:underline">Kembali ke Dashboard</button>
+                </div>`;
             app.ui.showScreen('start-test-screen');
         };
 
-        app.test.beginActualTest = (testKey) => {
-            let timeLeft = app.test.data.timerConfigs[testKey];
-            const timerEl = document.getElementById('time-remaining');
+        app.test.beginActualTest = () => {
+            let timeLeft = app.test.data.timerConfigs[app.test.state.currentTestKey];
+            const testScreen = document.getElementById('test-screen');
+            testScreen.innerHTML = `
+                <div class="bg-white p-4 rounded-xl shadow-md mb-6 flex justify-between items-center sticky top-4 z-10">
+                    <button class="back-to-dashboard text-indigo-600 hover:text-indigo-800 text-sm"><i class="fas fa-arrow-left mr-2"></i>Kembali</button>
+                    <div class="font-bold text-xl text-red-600 bg-red-100 px-4 py-2 rounded-full"><i class="far fa-clock mr-2"></i><span id="time-remaining">${app.test.formatTime(timeLeft)}</span></div>
+                </div>
+                <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg">
+                    <h2 id="test-title" class="text-2xl font-bold mb-2 text-center"></h2>
+                    <p id="test-section-title" class="text-center text-gray-500 mb-6"></p>
+                    <div id="question-container"></div>
+                    <div id="navigation-container" class="flex justify-between items-center mt-8">
+                        <button id="prev-btn" class="bg-gray-200 text-gray-700 font-bold py-2 px-6 rounded-full hover:bg-gray-300 transition duration-300">Sebelumnya</button>
+                        <div id="progress-text" class="text-sm text-gray-500"></div>
+                        <button id="next-btn" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-full hover:bg-blue-700 transition duration-300">Berikutnya</button>
+                        <button id="submit-btn" class="hidden w-full bg-green-600 text-white font-bold py-3 px-4 rounded-full hover:bg-green-700 transition duration-300 transform hover:scale-105">Lihat Hasil Tes</button>
+                    </div>
+                </div>`;
 
+            const timerEl = testScreen.querySelector('#time-remaining');
             app.test.state.testTimerInterval = setInterval(() => {
                 timeLeft--;
                 timerEl.textContent = app.test.formatTime(timeLeft);
@@ -590,7 +486,6 @@
             }, 1000);
 
             if (app.test.state.currentTest.testType === 'disc') app.test.renderDiscTest();
-            else if (app.test.state.currentTest.testType === 'riasec') app.test.renderRIASECPage();
             else app.test.renderQuestion();
             app.ui.showScreen('test-screen');
         };
@@ -612,7 +507,7 @@
             document.getElementById('test-section-title').textContent = 'Pilih yang Paling & Kurang Sesuai';
             
             const container = document.getElementById('question-container');
-            container.innerHTML = `<div class="bg-blue-50 border-l-4 border-blue-400 text-blue-700 p-4 mb-6 rounded-r-lg" role="alert"><p class="font-bold">Petunjuk Pengerjaan Tes DISC</p><ul class="list-disc list-inside mt-2"><li>Pilih satu pernyataan yang <strong>Paling Sesuai</strong> dengan diri Anda dengan menekan tombol hijau.</li><li>Pilih satu pernyataan yang <strong>Kurang Sesuai</strong> dengan diri Anda dengan menekan tombol merah.</li><li>Anda harus memilih satu "Paling Sesuai" dan satu "Kurang Sesuai" untuk setiap kelompok.</li><li>Pilihan Anda untuk keduanya tidak boleh pada pernyataan yang sama.</li></ul></div>`;
+            container.innerHTML = `<div class="bg-blue-50 border-l-4 border-blue-400 text-blue-700 p-4 mb-6 rounded-r-lg" role="alert"><p class="font-bold">Petunjuk</p><p>Di setiap kelompok, pilih satu yang <strong>Paling Sesuai</strong> (hijau) dan satu yang <strong>Kurang Sesuai</strong> (merah) dengan diri Anda.</p></div>`;
             container.className = 'space-y-6';
 
             currentTest.questions.forEach((item, index) => {
@@ -621,7 +516,14 @@
                 card.id = `question-${item.q}`;
                 if (index > 0) card.classList.add('locked');
 
-                let optionsHtml = item.options.map((opt, idx) => `<div class="flex items-center justify-between py-3 border-b border-slate-200 last:border-b-0"><span class="text-slate-700 flex-1">${opt}</span><div class="flex items-center space-x-3"><label><input type="radio" name="most-${item.q}" value="${idx}" class="radio-custom radio-m"><span class="radio-label text-green-700 border-green-200 hover:bg-green-50">Paling Sesuai</span></label><label><input type="radio" name="least-${item.q}" value="${idx}" class="radio-custom radio-l"><span class="radio-label text-red-700 border-red-200 hover:bg-red-50">Kurang Sesuai</span></label></div></div>`).join('');
+                let optionsHtml = item.options.map((opt, idx) => `
+                    <div class="flex flex-col sm:flex-row items-center justify-between py-3 border-b border-slate-200 last:border-b-0">
+                        <span class="text-slate-700 flex-1 mb-3 sm:mb-0 text-center sm:text-left">${opt}</span>
+                        <div class="flex items-center space-x-2 sm:space-x-3">
+                            <label><input type="radio" name="most-${item.q}" value="${idx}" class="radio-custom radio-m"><span class="radio-label text-sm sm:text-base text-green-700 border-green-200 hover:bg-green-50">Paling</span></label>
+                            <label><input type="radio" name="least-${item.q}" value="${idx}" class="radio-custom radio-l"><span class="radio-label text-sm sm:text-base text-red-700 border-red-200 hover:bg-red-50">Kurang</span></label>
+                        </div>
+                    </div>`).join('');
                 card.innerHTML = `<h3 class="font-bold text-lg mb-3 text-slate-800">Kelompok ${item.q}</h3><div>${optionsHtml}</div>`;
                 container.appendChild(card);
             });
@@ -646,7 +548,7 @@
 
                 if (mostSelected && leastSelected) {
                     if (mostSelected.value === leastSelected.value) {
-                        app.ui.showCustomAlert(`Pada kelompok ${qNum}, pilihan "Paling Sesuai" dan "Kurang Sesuai" tidak boleh sama.`);
+                        app.ui.showCustomAlert(`Pada kelompok ${qNum}, pilihan "Paling" dan "Kurang" tidak boleh sama.`);
                         e.target.checked = false;
                         return;
                     }
@@ -667,198 +569,63 @@
             }
         };
 
-        app.test.getVisualForQuestion = (question) => {
-            const svgContainer = (svgContent) => `<div class="flex justify-center items-center my-4 p-4 bg-gray-100 rounded-lg">${svgContent}</div>`;
-            let svg = '';
-            switch (question.id) {
-                case 25: svg = `<svg width="250" height="40" viewBox="0 0 250 40"><rect x="10" y="10" width="20" height="20" fill="#6366f1"/><circle cx="50" cy="20" r="10" fill="#6366f1"/><polygon points="70,30 80,10 90,30" fill="#6366f1"/><rect x="110" y="10" width="20" height="20" fill="#6366f1"/><circle cx="150" cy="20" r="10" fill="#6366f1"/><text x="170" y="25" font-size="20" fill="#9ca3af">?</text></svg>`; break;
-                case 26: svg = `<svg width="250" height="50" viewBox="0 0 250 50"><g transform="translate(25, 25)"><circle r="20" stroke="black" fill="white" stroke-width="2"/><line x1="0" y1="0" x2="0" y2="-12" stroke="black" stroke-width="2"/><line x1="0" y1="0" x2="15" y2="0" stroke="black" stroke-width="1.5"/></g><g transform="translate(75, 25)"><circle r="20" stroke="black" fill="white" stroke-width="2"/><line x1="0" y1="0" x2="0" y2="-12" stroke="black" stroke-width="2"/><line x1="0" y1="0" x2="15" y2="0" stroke="black" stroke-width="1.5"/></g><g transform="translate(125, 25)"><circle r="20" stroke="black" fill="white" stroke-width="2"/><line x1="0" y1="0" x2="0" y2="-12" stroke="black" stroke-width="2"/><line x1="0" y1="0" x2="-15" y2="0" stroke="black" stroke-width="1.5"/></g><g transform="translate(175, 25)"><circle r="20" stroke="black" fill="white" stroke-width="2"/><line x1="0" y1="0" x2="0" y2="-12" stroke="black" stroke-width="2"/><line x1="0" y1="0" x2="15" y2="0" stroke="black" stroke-width="1.5"/></g><g transform="translate(225, 25)"><circle r="20" stroke="black" fill="white" stroke-width="2"/><line x1="0" y1="0" x2="0" y2="-12" stroke="black" stroke-width="2"/><line x1="0" y1="0" x2="15" y2="0" stroke="black" stroke-width="1.5"/></g></svg>`; break;
-                case 27: svg = `<svg width="100" height="50" viewBox="0 0 100 50"><g transform="translate(25, 25)"><polygon points="0,-15 10,5 -10,5" fill="#6366f1"/></g><text x="45" y="30" font-size="20">→</text><text x="65" y="30" font-size="25" fill="#9ca3af">?</text></svg>`; break;
-                case 28: svg = `<svg width="200" height="50" viewBox="0 0 200 50"><circle cx="25" cy="25" r="15" stroke="black" fill="none" stroke-width="2"/><text x="45" y="32">:</text><path d="M 65 40 A 15 15 0 0 1 95 40" stroke="black" fill="none" stroke-width="2"/><text x="105" y="32">::</text><rect x="125" y="10" width="30" height="30" stroke="black" fill="none" stroke-width="2"/><text x="160" y="32">:</text><text x="175" y="32" font-size="25" fill="#9ca3af">?</text></svg>`; break;
-                case 31: svg = `<svg width="100" height="100" viewBox="0 0 100 100"><rect x="5" y="5" width="90" height="90" stroke="black" fill="white" stroke-width="2"/><line x1="5" y1="50" x2="95" y2="50" stroke="black" stroke-width="2"/><line x1="50" y1="5" x2="50" y2="95" stroke="black" stroke-width="2"/><line x1="5" y1="5" x2="95" y2="95" stroke="black" stroke-width="1"/></svg>`; break;
-                case 34: svg = `<svg width="200" height="200" viewBox="0 0 100 100"><g stroke="#d1d5db" stroke-width="0.5"><line x1="10" y1="10" x2="90" y2="90" /><line x1="10" y1="90" x2="90" y2="10" /><line x1="50" y1="0" x2="50" y2="100" /><line x1="0" y1="50" x2="100" y2="50" /><line x1="0" y1="0" x2="100" y2="100" /><line x1="100" y1="0" x2="0" y2="100" /><circle cx="50" cy="50" r="40" fill="none" /><rect x="20" y="20" width="60" height="60" fill="none" /><line x1="20" y1="20" x2="80" y2="80" /><line x1="20" y1="80" x2="80" y2="20" /></g><polygon points="65,35 66,38 69,38 67,40 68,43 65,41 62,43 63,40 61,38 64,38" fill="#a1a1aa" /></svg>`; break;
-                case 36: svg = `<svg width="250" height="50" viewBox="0 0 250 50"><g transform="translate(25, 25)"><circle r="20" stroke="black" fill="#fef08a" stroke-width="2"/><circle cx="-7" cy="-5" r="2"/><circle cx="7" cy="-5" r="2"/><path d="M -10 8 Q 0 15 10 8" stroke="black" fill="none" stroke-width="2"/></g><g transform="translate(75, 25)"><circle r="20" stroke="black" fill="#fef08a" stroke-width="2"/><circle cx="-7" cy="-5" r="2"/><circle cx="7" cy="-5" r="2"/><path d="M -10 8 Q 0 15 10 8" stroke="black" fill="none" stroke-width="2"/></g><g transform="translate(125, 25)"><circle r="20" stroke="black" fill="#fef08a" stroke-width="2"/><circle cx="-7" cy="-5" r="2"/><circle cx="7" cy="-5" r="2"/><path d="M -10 8 Q 0 15 10 8" stroke="black" fill="none" stroke-width="2"/><path d="M -12 -12 Q -7 -15 -2 -12" stroke="black" fill="none" stroke-width="1.5"/></g><g transform="translate(175, 25)"><circle r="20" stroke="black" fill="#fef08a" stroke-width="2"/><circle cx="-7" cy="-5" r="2"/><circle cx="7" cy="-5" r="2"/><path d="M -10 8 Q 0 15 10 8" stroke="black" fill="none" stroke-width="2"/></g><g transform="translate(225, 25)"><circle r="20" stroke="black" fill="#fef08a" stroke-width="2"/><circle cx="-7" cy="-5" r="2"/><circle cx="7" cy="-5" r="2"/><path d="M -10 8 Q 0 15 10 8" stroke="black" fill="none" stroke-width="2"/></g></svg>`; break;
-                default: return '';
-            }
-            return svgContainer(svg);
-        };
-
-        app.test.renderRIASECPage = () => {
-            const { riasecCurrentPage, riasecQuestionsPerPage, currentTest, userAnswers } = app.test.state;
-            const container = document.getElementById('question-container');
-            container.innerHTML = '';
-            container.className = 'space-y-4';
-
-            document.getElementById('test-title').textContent = currentTest.title;
-            document.getElementById('test-section-title').textContent = `Jawablah sesuai minat Anda`;
-
-            const startIndex = (riasecCurrentPage - 1) * riasecQuestionsPerPage;
-            const endIndex = startIndex + riasecQuestionsPerPage;
-            const pageQuestions = currentTest.questions.slice(startIndex, endIndex);
-
-            pageQuestions.forEach((q) => {
-                const questionCard = document.createElement('div');
-                questionCard.className = 'bg-white p-5 rounded-lg shadow-sm border';
-                const answer = userAnswers[q.originalIndex];
-
-                questionCard.innerHTML = `
-                    <p class="text-lg text-center mb-4 text-gray-800">${q.q}</p>
-                    <div class="flex justify-center gap-4">
-                        <label>
-                            <input type="radio" name="riasec-${q.originalIndex}" value="1" class="hidden suka-radio" onchange="app.test.state.userAnswers[${q.originalIndex}] = 1;" ${answer === 1 ? 'checked' : ''}>
-                            <span class="riasec-label px-8 py-3 rounded-full cursor-pointer font-semibold text-gray-700"><i class="fas fa-thumbs-up mr-2"></i>Suka</span>
-                        </label>
-                        <label>
-                            <input type="radio" name="riasec-${q.originalIndex}" value="0" class="hidden tidaksuka-radio" onchange="app.test.state.userAnswers[${q.originalIndex}] = 0;" ${answer === 0 ? 'checked' : ''}>
-                            <span class="riasec-label px-8 py-3 rounded-full cursor-pointer font-semibold text-gray-700"><i class="fas fa-thumbs-down mr-2"></i>Tidak Suka</span>
-                        </label>
-                    </div>`;
-                container.appendChild(questionCard);
-            });
-            app.test.updateNavButtons();
-        };
-
         app.test.renderQuestion = () => {
             const { currentTest, currentQuestionIndex, userAnswers } = app.test.state;
-            if (currentTest.testType === 'riasec') { app.test.renderRIASECPage(); return; }
             
             document.getElementById('test-title').textContent = currentTest.title;
             const questionData = currentTest.questions[currentQuestionIndex];
             const container = document.getElementById('question-container');
-            container.innerHTML = ''; 
-
-            if (app.test.state.memoryTestInterval) clearInterval(app.test.state.memoryTestInterval);
-
-            if (currentTest.sections) {
-                document.getElementById('test-section-title').textContent = currentTest.sections[questionData.section];
-            }
             
-            if (questionData.section === 3 && !questionData.options) {
-                const stimulus = questionData.q.match(/Hafalkan: "(.*?)"/)[1];
-                let taskText = questionData.id === 39 ? questionData.q : (questionData.q.split('?')[1] || questionData.q).trim() + '?';
-                
-                const memoryContainer = document.createElement('div');
-                memoryContainer.innerHTML = `
-                    <div id="memory-stimulus" class="text-center p-4">
-                        <p class="text-gray-600 mb-2">Hafalkan informasi berikut dalam <span id="countdown" class="font-bold text-red-500">5</span> detik...</p>
-                        <div class="text-xl font-semibold text-indigo-700 p-4 bg-indigo-50 rounded-lg">${stimulus}</div>
-                    </div>
-                    <div id="memory-task" class="hidden">
-                        <p class="text-lg mb-4 text-center">${taskText}</p>
-                        <div id="options-container-wrapper" class="flex flex-col items-center space-y-3"></div>
-                    </div>`;
-                container.appendChild(memoryContainer);
-
-                let countdown = 5;
-                const countdownEl = document.getElementById('countdown');
-                app.test.state.memoryTestInterval = setInterval(() => {
-                    countdown--;
-                    countdownEl.textContent = countdown;
-                    if (countdown <= 0) {
-                        clearInterval(app.test.state.memoryTestInterval);
-                        document.getElementById('memory-stimulus').style.display = 'none';
-                        document.getElementById('memory-task').classList.remove('hidden');
-                        const optionsContainer = document.getElementById('options-container-wrapper');
-                        const input = document.createElement('input');
-                        input.type = 'text';
-                        input.className = 'block w-full max-w-md text-center p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500';
-                        input.placeholder = 'Ketik jawaban Anda di sini';
-                        input.value = userAnswers[currentQuestionIndex] || '';
-                        input.onkeyup = (e) => { userAnswers[currentQuestionIndex] = e.target.value.trim(); };
-                        optionsContainer.appendChild(input);
-                        input.focus();
-                    }
-                }, 1000);
-                app.test.updateNavButtons();
-                return;
+            let sectionTitle = '';
+            if (currentTest.sections) {
+                sectionTitle = currentTest.sections[questionData.section];
+                document.getElementById('test-section-title').textContent = sectionTitle;
             }
 
-            const questionWrapper = document.createElement('div');
-            let visualHTML = questionData.isVisual ? app.test.getVisualForQuestion(questionData) : '';
-            questionWrapper.innerHTML = `<p class="text-lg mb-4 text-center">${questionData.q}</p>${visualHTML}`;
-
-            const optionsContainer = document.createElement('div');
-            optionsContainer.className = 'flex flex-col items-center space-y-3';
+            let questionHTML = `<p class="text-lg sm:text-xl mb-4 text-center">${questionData.q}</p>`;
+            
             const optionsToUse = questionData.options || currentTest.options;
-
+            let optionsHTML = '<div class="flex flex-col items-center space-y-3">';
             if (optionsToUse) {
-                let options = [...optionsToUse];
-                if (questionData.options) options.sort(() => Math.random() - 0.5);
-
-                options.forEach((option, index) => {
+                optionsToUse.forEach((option, index) => {
                     const optionValue = option.value !== undefined ? option.value : option;
                     const optionId = `q${currentQuestionIndex}_option${index}`;
-                    const wrapper = document.createElement('div');
-                    wrapper.className = 'w-full max-w-md';
-                    const input = document.createElement('input');
-                    input.type = 'radio';
-                    input.id = optionId;
-                    input.name = `question_${currentQuestionIndex}`;
-                    input.value = optionValue;
-                    input.className = 'hidden peer';
-                    if (userAnswers[currentQuestionIndex] !== undefined && String(userAnswers[currentQuestionIndex]) == String(optionValue)) {
-                        input.checked = true;
-                    }
-                    input.onchange = () => { app.test.state.userAnswers[currentQuestionIndex] = isNaN(optionValue) ? optionValue : parseInt(optionValue); };
-                    const label = document.createElement('label');
-                    label.htmlFor = optionId;
-                    label.textContent = option.text || option;
-                    label.className = 'block w-full text-center p-3 border border-gray-300 rounded-lg cursor-pointer peer-checked:bg-indigo-600 peer-checked:text-white peer-checked:border-indigo-600 hover:bg-indigo-50';
-                    wrapper.appendChild(input);
-                    wrapper.appendChild(label);
-                    optionsContainer.appendChild(wrapper);
+                    const isChecked = userAnswers[currentQuestionIndex] !== undefined && String(userAnswers[currentQuestionIndex]) == String(optionValue);
+                    optionsHTML += `
+                        <div class="w-full max-w-md">
+                            <input type="radio" id="${optionId}" name="question_${currentQuestionIndex}" value="${optionValue}" class="hidden peer" ${isChecked ? 'checked' : ''}>
+                            <label for="${optionId}" class="block w-full text-center p-3 border border-gray-300 rounded-lg cursor-pointer peer-checked:bg-indigo-600 peer-checked:text-white peer-checked:border-indigo-600 hover:bg-indigo-50">${option.text || option}</label>
+                        </div>`;
                 });
-            } else {
-                const wrapper = document.createElement('div');
-                wrapper.className = 'w-full max-w-md';
-                const input = document.createElement('input');
-                input.type = 'text';
-                input.className = 'block w-full text-center p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500';
-                input.placeholder = 'Ketik jawaban Anda di sini';
-                input.value = userAnswers[currentQuestionIndex] || '';
-                input.onkeyup = (e) => { userAnswers[currentQuestionIndex] = e.target.value.trim(); };
-                wrapper.appendChild(input);
-                optionsContainer.appendChild(wrapper);
             }
+            optionsHTML += '</div>';
             
-            questionWrapper.appendChild(optionsContainer);
-            container.appendChild(questionWrapper);
+            container.innerHTML = questionHTML + optionsHTML;
+            container.querySelector('input[type="radio"]')?.addEventListener('change', (e) => {
+                const value = e.target.value;
+                app.test.state.userAnswers[currentQuestionIndex] = isNaN(value) ? value : parseInt(value);
+            });
+
             app.test.updateNavButtons();
         };
 
         app.test.updateNavButtons = () => {
-            const { currentTest, currentQuestionIndex, riasecCurrentPage, riasecQuestionsPerPage } = app.test.state;
+            const { currentTest, currentQuestionIndex } = app.test.state;
             const prevBtn = document.getElementById('prev-btn');
             const nextBtn = document.getElementById('next-btn');
             const submitBtn = document.getElementById('submit-btn');
             const progressText = document.getElementById('progress-text');
             
-            if (currentTest.testType === 'riasec') {
-                const totalPages = Math.ceil(currentTest.questions.length / riasecQuestionsPerPage);
-                prevBtn.style.visibility = riasecCurrentPage > 1 ? 'visible' : 'hidden';
-                nextBtn.style.display = riasecCurrentPage < totalPages ? 'inline-block' : 'none';
-                submitBtn.style.display = riasecCurrentPage === totalPages ? 'inline-block' : 'none';
-                progressText.textContent = `Halaman ${riasecCurrentPage} dari ${totalPages}`;
-            } else {
-                prevBtn.style.visibility = currentQuestionIndex > 0 ? 'visible' : 'hidden';
-                nextBtn.style.display = currentQuestionIndex < currentTest.questions.length - 1 ? 'inline-block' : 'none';
-                submitBtn.style.display = currentQuestionIndex === currentTest.questions.length - 1 ? 'inline-block' : 'none';
-                progressText.textContent = `Pertanyaan ${currentQuestionIndex + 1} dari ${currentTest.questions.length}`;
-            }
+            prevBtn.style.visibility = currentQuestionIndex > 0 ? 'visible' : 'hidden';
+            nextBtn.style.display = currentQuestionIndex < currentTest.questions.length - 1 ? 'inline-block' : 'none';
+            submitBtn.style.display = currentQuestionIndex === currentTest.questions.length - 1 ? 'inline-block' : 'none';
+            progressText.textContent = `Soal ${currentQuestionIndex + 1} dari ${currentTest.questions.length}`;
         };
 
         app.test.nextQuestion = () => {
-            const { currentTest, currentQuestionIndex, riasecCurrentPage, riasecQuestionsPerPage, userAnswers } = app.test.state;
-            if (currentTest.testType === 'riasec') {
-                const totalPages = Math.ceil(currentTest.questions.length / riasecQuestionsPerPage);
-                if (riasecCurrentPage < totalPages) {
-                    app.test.state.riasecCurrentPage++;
-                    app.test.renderRIASECPage();
-                }
-                return;
-            }
+            const { currentTest, currentQuestionIndex, userAnswers } = app.test.state;
             if (userAnswers[currentQuestionIndex] === undefined || userAnswers[currentQuestionIndex] === '') {
-                app.ui.showCustomAlert('Silakan pilih atau isi jawaban terlebih dahulu.'); return;
+                app.ui.showCustomAlert('Silakan pilih jawaban terlebih dahulu.'); return;
             }
             if (currentQuestionIndex < currentTest.questions.length - 1) {
                 app.test.state.currentQuestionIndex++;
@@ -867,14 +634,6 @@
         };
 
         app.test.prevQuestion = () => {
-            const { currentTest, riasecCurrentPage } = app.test.state;
-            if (currentTest.testType === 'riasec') {
-                if (riasecCurrentPage > 1) {
-                    app.test.state.riasecCurrentPage--;
-                    app.test.renderRIASECPage();
-                }
-                return;
-            }
             if (app.test.state.currentQuestionIndex > 0) {
                 app.test.state.currentQuestionIndex--;
                 app.test.renderQuestion();
@@ -883,43 +642,42 @@
 
         app.test.submitTest = () => {
             const { currentTest, userAnswers, currentQuestionIndex } = app.test.state;
-             if (currentTest.testType === 'riasec') {
-                if (Object.keys(userAnswers).length < currentTest.questions.length) {
-                    app.ui.showCustomAlert('Harap jawab semua pertanyaan sebelum melihat hasil.');
-                    return;
-                }
-             } else if (currentTest.testType !== 'disc' && (userAnswers[currentQuestionIndex] === undefined || userAnswers[currentQuestionIndex] === '')) {
+            if (currentTest.testType !== 'disc' && (userAnswers[currentQuestionIndex] === undefined || userAnswers[currentQuestionIndex] === '')) {
                 app.ui.showCustomAlert('Silakan isi jawaban terlebih dahulu.'); return;
-             }
-             if (app.test.state.testTimerInterval) clearInterval(app.test.state.testTimerInterval);
-             app.test.confirmAndAnalyze();
+            }
+            if (app.test.state.testTimerInterval) clearInterval(app.test.state.testTimerInterval);
+            app.test.confirmAndAnalyze();
         };
 
         app.test.confirmAndAnalyze = () => {
             if (app.test.state.testTimerInterval) clearInterval(app.test.state.testTimerInterval);
+            const resultsScreen = document.getElementById('results-screen');
+            resultsScreen.innerHTML = `
+                <button class="back-to-dashboard mb-6 text-indigo-600 hover:text-indigo-800"><i class="fas fa-arrow-left mr-2"></i>Kembali ke Dashboard</button>
+                <div id="loading-indicator" class="text-center p-8">
+                    <i class="fas fa-spinner fa-spin text-4xl text-indigo-500"></i>
+                    <p class="mt-4 text-gray-600">Kami sedang menganalisa jawaban Anda...</p>
+                </div>
+                <div id="results-content" class="bg-white p-6 sm:p-8 rounded-xl shadow-lg hidden"></div>`;
             app.ui.showScreen('results-screen');
-            document.getElementById('loading-indicator').style.display = 'block';
-            document.getElementById('results-content').classList.add('hidden');
             app.test.processResultsAndGenerateAnalysis();
         };
 
         app.test.processResultsAndGenerateAnalysis = () => {
             const { currentTest, currentUser, userAnswers } = app.test.state;
             let resultsSummary = {};
-            let promptText = `Anda adalah seorang konsultan psikologi ahli. Pengguna bernama ${currentUser} telah menyelesaikan tes untuk pengembangan diri. Tugas Anda adalah membuat laporan psikologis yang profesional, tajam, dan sangat bisa ditindaklanjuti, sesuai format yang saya berikan. Gunakan format Markdown. `;
+            let promptText = `Anda adalah seorang konsultan psikologi ahli. Pengguna bernama ${currentUser} telah menyelesaikan tes. Buat laporan psikologis yang profesional, tajam, dan bisa ditindaklanjuti, dalam format Markdown. `;
             
             if (currentTest.name === 'Tes Komprehensif Premium') {
                 const oceanScores = { O: [], C: [], E: [], A: [], N: [] };
                 const valueScores = {};
                 const motivationScores = {};
-                
                 currentTest.questions.forEach((q, i) => {
                     let answer = userAnswers[i];
                     if (q.section === 0) { if (q.reverse) answer = 6 - answer; oceanScores[q.type].push(answer); } 
                     else if (q.section === 1) { valueScores[q.type] = answer; } 
                     else if (q.section === 2) { motivationScores[q.type] = answer; }
                 });
-
                 const oceanResult = {};
                 for (const key in oceanScores) {
                     const avg = oceanScores[key].reduce((a, b) => a + b, 0) / oceanScores[key].length;
@@ -928,19 +686,18 @@
                 const top3Values = Object.entries(valueScores).sort(([,a],[,b]) => b-a).slice(0, 3).map(e => e[0]);
                 const top2Motivations = Object.entries(motivationScores).sort(([,a],[,b]) => b-a).slice(0, 2).map(e => e[0]);
                 resultsSummary = { ocean: oceanResult, values: top3Values, motivations: top2Motivations };
-                promptText += `Buat laporan dengan format persis seperti ini: **Judul Tes:** Tes Psikologi Komprehensif: Kepribadian, Nilai, dan Motivasi\n**Tujuan Tes:** Memberikan pemetaan menyeluruh tentang kecenderungan kepribadian, nilai hidup, dan pendorong motivasi utama untuk ${currentUser}.\n\n**Output & Interpretasi:**\nBerikut adalah hasil pemetaan profil psikologis Anda:\n\n**1. Hasil per Dimensi**\n* **Kepribadian (OCEAN):** Openness (${resultsSummary.ocean.O}), Conscientiousness (${resultsSummary.ocean.C}), Extraversion (${resultsSummary.ocean.E}), Agreeableness (${resultsSummary.ocean.A}), Neuroticism (${resultsSummary.ocean.N}).\n* **Nilai Personal Teratas:** ${resultsSummary.values.join(', ')}.\n* **Pendorong Motivasi Utama:** ${resultsSummary.motivations.join(', ')}.\n\n**2. Deskripsi Naratif**\n(Di sini, sintesis semua data di atas. Jelaskan bagaimana kepribadian, nilai, dan motivasi ini saling berinteraksi untuk menciptakan individu yang unik. Berikan analisis tajam tentang kekuatan dan potensi titik buta).\n\n**3. Saran Pengembangan Diri**\n(Berikan 3-5 poin saran konkret untuk pertumbuhan personal berdasarkan analisis di atas).\n\n**4. Rekomendasi Praktis**\n* **Profesi:** (Sebutkan 3-5 profesi spesifik yang paling cocok).\n* **Gaya Belajar:** (Jelaskan gaya belajar yang paling efektif).\n* **Pola Kerja:** (Jelaskan lingkungan dan pola kerja yang paling produktif).\n\n**Catatan Tambahan:**\nLaporan ini adalah cermin untuk refleksi, bukan label mutlak. Gunakan wawasan ini sebagai alat untuk membuat keputusan yang lebih sadar dan selaras dengan diri Anda.`;
+                promptText += `Hasil tes komprehensif: Kepribadian OCEAN: ${JSON.stringify(resultsSummary.ocean)}, Nilai Teratas: ${resultsSummary.values.join(', ')}, Motivasi Utama: ${resultsSummary.motivations.join(', ')}. Sintesis semua data ini menjadi deskripsi naratif, berikan 3-5 saran pengembangan diri, dan 3-5 rekomendasi profesi yang cocok.`;
             } else if (currentTest.name === 'Kognitif Premium') {
                 const scores = {};
                 currentTest.sections.forEach(sec => scores[sec] = { correct: 0, total: 0 });
-                
                 currentTest.questions.forEach((q, i) => {
                     const sectionName = currentTest.sections[q.section];
                     scores[sectionName].total++;
                     const userAnswer = userAnswers[i];
                     let isCorrect = false;
                     if (q.options) {
-                        const selectedOptionText = q.options.find(opt => (opt.value !== undefined ? opt.value : opt) == userAnswer)?.text || userAnswer;
-                        isCorrect = String(selectedOptionText || '').toLowerCase() === String(q.answer).toLowerCase();
+                        const selectedOptionText = q.options.find(opt => (opt.value !== undefined ? opt.value : opt) == userAnswer) || userAnswer;
+                        isCorrect = String(selectedOptionText).toLowerCase() === String(q.answer).toLowerCase();
                     } else {
                         if (Array.isArray(q.answer)) isCorrect = q.answer.some(ans => String(ans).toLowerCase().trim() === String(userAnswer).toLowerCase().trim());
                         else isCorrect = String(userAnswer || '').toLowerCase().replace(/[\s,.-]/g, '') === String(q.answer).toLowerCase().replace(/[\s,.-]/g, '');
@@ -948,7 +705,7 @@
                     if (isCorrect) scores[sectionName].correct++;
                 });
                 resultsSummary = scores;
-                promptText += `Pengguna telah menyelesaikan Tes IQ Komprehensif. Hasilnya per subskala adalah: ${JSON.stringify(resultsSummary)}. Buat laporan dengan format persis seperti ini:\n**Judul Tes:** Tes IQ Komprehensif\n**Tujuan Tes:** Memberikan pemetaan kemampuan kognitif ${currentUser} di lima subskala utama.\n\n**Output & Interpretasi:**\nBerikut adalah hasil pemetaan kemampuan kognitif Anda:\n\n**1. Hasil per Subskala**\n(Tampilkan skor untuk setiap dari 5 subskala, contoh: * **Penalaran Verbal:** ${resultsSummary['Penalaran Verbal'].correct} / ${resultsSummary['Penalaran Verbal'].total}).\n\n**2. Deskripsi Naratif**\n(Berikan analisis tajam berdasarkan profil skor. Tunjukkan area kekuatan (skor tertinggi) dan area yang perlu menjadi fokus pengembangan (skor terendah). Jelaskan implikasi praktis dari profil ini).\n\n**3. Saran Pengembangan Diri**\n(Berikan 3-5 poin saran konkret. Untuk setiap area dengan skor rendah, berikan satu latihan spesifik untuk memperbaikinya).\n\n**4. Rekomendasi Praktis**\n* **Profesi:** (Berdasarkan profil kognitif, sebutkan 3-5 profesi yang paling cocok. Contoh: Skor verbal tinggi cocok untuk hukum/komunikasi, skor numerik tinggi cocok untuk keuangan/analisis data).\n* **Gaya Belajar:** (Jelaskan gaya belajar yang paling efektif berdasarkan kekuatan kognitif).\n* **Pola Kerja:** (Jelaskan lingkungan dan pola kerja yang paling produktif).\n\n**Catatan Tambahan:**\nSkor IQ adalah potret sesaat dan dapat dikembangkan. Gunakan laporan ini sebagai panduan untuk mengasah potensi kognitif Anda.`;
+                promptText += `Hasil Tes IQ Komprehensif per subskala: ${JSON.stringify(resultsSummary)}. Berikan analisis naratif, tunjukkan area kekuatan dan pengembangan, berikan saran konkret untuk area skor rendah, dan rekomendasikan 3-5 profesi yang cocok.`;
             } else if (currentTest.name === 'DISC Premium') {
                 const scores = { D: 0, I: 0, S: 0, C: 0 };
                 currentTest.questions.forEach(q => {
@@ -962,7 +719,7 @@
                     }
                 });
                 resultsSummary = scores;
-                promptText += `Pengguna telah menyelesaikan Tes Perilaku DISC. Hasil skornya adalah: Dominance (D): ${scores.D}, Influence (I): ${scores.I}, Steadiness (S): ${scores.S}, Conscientiousness (C): ${scores.C}. Berdasarkan skor ini, buat laporan profesional dengan format: **Ringkasan Eksekutif**, **Analisis Profil Mendalam** (termasuk Kekuatan Super dan Potensi Titik Buta), dan **Rencana Aksi Personal** dengan 3 langkah konkret (Apa, Mengapa, Bagaimana).`;
+                promptText += `Hasil Tes Perilaku DISC: Dominance (D): ${scores.D}, Influence (I): ${scores.I}, Steadiness (S): ${scores.S}, Conscientiousness (C): ${scores.C}. Buat laporan profesional dengan format: **Ringkasan Eksekutif**, **Analisis Profil Mendalam** (termasuk Kekuatan dan Potensi Titik Buta), dan **Rencana Aksi Personal** dengan 3 langkah konkret.`;
             } else if (currentTest.name === 'Minat Bakat Premium') {
                 const scores = { R: 0, I: 0, A: 0, S: 0, E: 0, C: 0 };
                 currentTest.questions.forEach((q) => {
@@ -971,64 +728,48 @@
                 const sortedScores = Object.entries(scores).sort(([,a],[,b]) => b-a);
                 const hollandCode = sortedScores.slice(0, 3).map(item => item[0]).join('');
                 resultsSummary = { hollandCode: hollandCode, scores: scores };
-                promptText += `Pengguna telah menyelesaikan Tes Minat Bakat Holland (RIASEC). Hasilnya adalah Kode Holland 3 huruf: **${hollandCode}**. Skor mentahnya adalah: ${JSON.stringify(scores)}.\n\nBuat laporan dengan format persis seperti ini:\n**Judul Tes:** Tes Minat Bakat (RIASEC)\n**Tujuan Tes:** Mengidentifikasi tiga tipe minat dominan pengguna untuk memberikan arahan karir yang sesuai.\n\n**Output & Interpretasi:**\nBerikut adalah Kode Holland Anda:\n\n**1. Kode Holland Anda: ${hollandCode}**\n\n**2. Deskripsi Tipe Minat Dominan:**\n(Jelaskan secara mendalam arti dari 3 huruf dalam Kode Holland tersebut. Misalnya, jika kodenya RIA, jelaskan apa itu Realistic, Investigative, dan Artistic secara berurutan dan bagaimana ketiganya berinteraksi dalam diri pengguna).\n\n**3. Lingkungan Kerja Ideal:**\n(Berdasarkan Kode Holland, deskripsikan tipe lingkungan kerja, tugas, dan suasana yang paling membuat pengguna merasa termotivasi dan puas).\n\n**4. Rekomendasi Karir Sesuai Minat:**\n(Berikan 5-7 contoh profesi spesifik yang sangat cocok dengan Kode Holland ${hollandCode}).\n\n**Catatan Tambahan:**\nMinat dapat berkembang seiring waktu. Gunakan hasil ini sebagai kompas untuk menjelajahi pilihan karir yang paling selaras dengan diri Anda saat ini.`;
+                promptText += `Hasil Tes Minat Bakat Holland (RIASEC) adalah Kode Holland: **${hollandCode}**. Jelaskan secara mendalam arti 3 huruf tersebut, deskripsikan lingkungan kerja ideal, dan berikan 5-7 contoh profesi spesifik yang cocok.`;
             }
 
             app.test.callGeminiAPI(promptText, resultsSummary, app.test.displayResults);
         };
         
-        // =======================================================
-        // PERINGATAN: METODE INI TIDAK AMAN UNTUK PRODUKSI
-        // =======================================================
-        // Metode ini mengekspos API Key Anda ke publik.
-        // Gunakan hanya untuk tujuan MVP/pengujian pribadi.
         app.test.callGeminiAPI = async (prompt, results, callback) => {
-            // GANTI DENGAN API KEY ANDA DI SINI
-            const apiKey = "AIzaSyBGR72HYabTI1UqR-hXWMuAWaZe4KHTDsM"; 
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey};
-            
-            const payload = {
-                contents: [{ parts: [{ text: prompt }] }]
-            };
-
+            const apiKey = "MASUKKAN_API_KEY_ANDA_DI_SINI"; 
+            if (apiKey === "MASUKKAN_API_KEY_ANDA_DI_SINI") {
+                const errorText = "API Key belum dimasukkan. Silakan edit file index.html dan masukkan API Key Anda.";
+                app.test.displayResults({ analysis: errorText, summary: results, testName: app.test.state.currentTest.name });
+                return;
+            }
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+            const payload = { contents: [{ parts: [{ text: prompt }] }] };
             try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
+                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    const errorBody = await response.json();
+                    console.error("API Error Body:", errorBody);
+                    throw new Error(`HTTP error! status: ${response.status} - ${errorBody.error?.message || 'Unknown Error'}`);
                 }
-
                 const data = await response.json();
                 const analysisText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Maaf, terjadi kesalahan saat AI menganalisis hasil.";
-                
-                if (callback === app.test.displayResults) {
-                    const resultData = { summary: results, analysis: analysisText, date: new Date().toLocaleString('id-ID'), testName: app.test.state.currentTest.name };
-                    app.test.state.savedResults[app.test.state.currentTest.name] = resultData;
-                    app.test.saveResultsToStorage();
-                    app.test.updateDashboard();
-                    callback(resultData);
-                } else {
-                    callback(analysisText);
-                }
+                const resultData = { summary: results, analysis: analysisText, date: new Date().toLocaleString('id-ID'), testName: app.test.state.currentTest.name };
+                app.test.state.savedResults[app.test.state.currentTest.name] = resultData;
+                app.test.saveResultsToStorage();
+                app.test.updateDashboard();
+                callback(resultData);
             } catch (error) {
                 console.error("Error calling Gemini API directly:", error);
                 const errorText = `Terjadi masalah koneksi saat menghubungi AI. Pastikan Anda terhubung ke internet dan coba lagi. Error: ${error.message}`;
-                if (callback === app.test.displayResults) {
-                    app.test.displayResults({ analysis: errorText, summary: results, testName: app.test.state.currentTest.name });
-                } else {
-                    callback(errorText);
-                }
+                callback({ analysis: errorText, summary: results, testName: app.test.state.currentTest.name });
             }
         };
 
         app.test.displayResults = (resultData) => {
-            document.getElementById('loading-indicator').style.display = 'none';
+            const loadingIndicator = document.getElementById('loading-indicator');
+            if (loadingIndicator) loadingIndicator.style.display = 'none';
+            
             const contentDiv = document.getElementById('results-content');
-            const { summary, analysis, date, testName } = resultData;
+            const { analysis, date, testName } = resultData;
 
             let formattedText = analysis.replace(/\*\*(.*?)\*\*/g, '<h3>$1</h3>').replace(/\n/g, '<br>');
             let resultSummaryHTML = `<h2 class="text-2xl font-bold mb-1 text-center">Laporan Psikologis untuk ${app.test.state.currentUser}</h2><p class="text-center text-sm text-gray-500 mb-4">Tes: ${app.test.data.questions[testName].title} | Diselesaikan pada: ${date || 'Saat ini'}</p>`;
@@ -1096,27 +837,28 @@
                     app.ui.showCustomAlert("Gagal membuat sertifikat. Silakan coba lagi.");
                 });
             };
-            qrCodeEl.onerror = () => {
-                 app.ui.showCustomAlert("Gagal memuat QR Code untuk sertifikat.");
-            };
+            qrCodeEl.onerror = () => app.ui.showCustomAlert("Gagal memuat QR Code untuk sertifikat.");
         };
 
         app.test.viewResult = (testName) => {
             const resultData = app.test.state.savedResults[testName];
             if (resultData) {
-                app.test.displayResults(resultData);
+                const resultsScreen = document.getElementById('results-screen');
+                resultsScreen.innerHTML = `
+                    <button class="back-to-dashboard mb-6 text-indigo-600 hover:text-indigo-800"><i class="fas fa-arrow-left mr-2"></i>Kembali ke Dashboard</button>
+                    <div id="results-content" class="bg-white p-6 sm:p-8 rounded-xl shadow-lg"></div>`;
                 app.ui.showScreen('results-screen');
+                app.test.displayResults(resultData);
             }
         };
         
         app.test.showCareerRecommendation = () => {
+            const screen = document.getElementById('career-reco-screen');
+            screen.innerHTML = `<button class="back-to-dashboard mb-6 text-indigo-600 hover:text-indigo-800"><i class="fas fa-arrow-left mr-2"></i>Kembali</button><div id="career-loading-indicator" class="text-center p-8"><i class="fas fa-spinner fa-spin text-4xl text-indigo-500"></i><p class="mt-4 text-gray-600">Menganalisis profil...</p></div><div id="career-content" class="bg-white p-6 sm:p-8 rounded-xl shadow-lg hidden"></div>`;
             app.ui.showScreen('career-reco-screen');
-            document.getElementById('career-loading-indicator').style.display = 'block';
-            document.getElementById('career-content').classList.add('hidden');
 
-            const completedTests = Object.keys(app.test.state.savedResults);
-            if (completedTests.length === 0) {
-                app.test.displayCareerRecommendation(`<div class="text-center"><h2 class="text-2xl font-bold mb-4">Mulai Perjalanan Karir Anda!</h2><p>Anda belum menyelesaikan tes apapun. Untuk mendapatkan rekomendasi karir, silakan selesaikan minimal satu tes dari dashboard.</p></div>`);
+            if (Object.keys(app.test.state.savedResults).length === 0) {
+                app.test.displayCareerRecommendation(`<div class="text-center"><h2 class="text-2xl font-bold mb-4">Mulai Perjalanan Karir Anda!</h2><p>Selesaikan minimal satu tes untuk mendapatkan rekomendasi karir.</p></div>`);
                 return;
             }
 
@@ -1127,7 +869,7 @@
                 else uncompletedTests.push(test.title);
             });
 
-            const prompt = `Anda adalah seorang konsultan karir dan pakar HR yang sangat berpengalaman. Berdasarkan data psikologis dari pengguna bernama ${app.test.state.currentUser} di bawah ini, berikan analisis mendalam dan rekomendasi karir.\n\nData yang tersedia:\n${JSON.stringify(combinedResults)}\n\nTugas Anda:\n1. **Sintesis Profil:** Gabungkan semua data yang ada untuk menciptakan gambaran holistik tentang kekuatan, kelemahan, preferensi kerja, dan potensi pengguna.\n2. **Rekomendasi Karir (Top 5):** Berikan 5 rekomendasi karir atau jalur bisnis yang paling cocok. Untuk setiap rekomendasi, jelaskan 'Mengapa' ini cocok berdasarkan data psikologis yang ada.\n3. **Analisis Kesenjangan & Tes Lanjutan:** Identifikasi informasi psikologis apa yang masih kurang. Berdasarkan tes yang *belum* diambil oleh pengguna (${uncompletedTests.join(', ') || 'Tidak ada'}), sarankan tes mana yang paling penting untuk diambil selanjutnya dan jelaskan mengapa.\n\nGunakan format Markdown yang rapi.`;
+            const prompt = `Anda adalah konsultan karir. Berdasarkan data psikologis pengguna ${app.test.state.currentUser} ini: ${JSON.stringify(combinedResults)}, berikan analisis holistik, 5 rekomendasi karir (jelaskan 'Mengapa'), dan sarankan tes lanjutan yang perlu diambil dari daftar ini: (${uncompletedTests.join(', ') || 'Tidak ada'}). Format dengan Markdown.`;
             app.test.callGeminiAPI(prompt, null, app.test.displayCareerRecommendation);
         };
 
@@ -1140,13 +882,12 @@
         };
 
         app.test.showRomanceRecommendation = () => {
+            const screen = document.getElementById('romance-reco-screen');
+            screen.innerHTML = `<button class="back-to-dashboard mb-6 text-indigo-600 hover:text-indigo-800"><i class="fas fa-arrow-left mr-2"></i>Kembali</button><div id="romance-loading-indicator" class="text-center p-8"><i class="fas fa-spinner fa-spin text-4xl text-pink-500"></i><p class="mt-4 text-gray-600">Menganalisis profil...</p></div><div id="romance-content" class="bg-white p-6 sm:p-8 rounded-xl shadow-lg hidden"></div>`;
             app.ui.showScreen('romance-reco-screen');
-            document.getElementById('romance-loading-indicator').style.display = 'block';
-            document.getElementById('romance-content').classList.add('hidden');
 
-            const completedTests = Object.keys(app.test.state.savedResults);
-            if (completedTests.length === 0) {
-                app.test.displayRomanceRecommendation(`<div class="text-center"><h2 class="text-2xl font-bold mb-4">Kenali Diri, Temukan Pasangan!</h2><p>Anda belum menyelesaikan tes apapun. Untuk mendapatkan rekomendasi, selesaikan minimal satu tes.</p></div>`);
+            if (Object.keys(app.test.state.savedResults).length === 0) {
+                app.test.displayRomanceRecommendation(`<div class="text-center"><h2 class="text-2xl font-bold mb-4">Kenali Diri, Temukan Pasangan!</h2><p>Selesaikan minimal satu tes untuk mendapatkan rekomendasi.</p></div>`);
                 return;
             }
 
@@ -1156,7 +897,7 @@
                 if (app.test.state.savedResults[testKey]) combinedResults[testKey] = app.test.state.savedResults[testKey].summary;
             });
 
-            const prompt = `Anda adalah seorang psikolog hubungan dan konselor percintaan yang bijaksana. Berdasarkan data psikologis lengkap dari pengguna bernama ${app.test.state.currentUser} di bawah ini, berikan analisis dan rekomendasi karakter pasangan yang cocok.\n\nData Psikologis Pengguna:\n${JSON.stringify(combinedResults)}\n\nTugas Anda:\n1. **Analisis Diri dalam Hubungan:** Jelaskan bagaimana karakter ${app.test.state.currentUser} cenderung berperilaku dalam hubungan asmara. Apa kekuatan utamanya? Apa potensi tantangannya?\n2. **Karakter Pasangan Ideal:** Deskripsikan tipe karakter pasangan yang paling harmonis dan cocok untuk ${app.test.state.currentUser}.\n3. **Tips Hubungan:** Berikan 3 tips praktis bagi ${app.test.state.currentUser} untuk membangun hubungan yang sehat.\n\nGunakan bahasa yang empatik, positif, dan membangun. Format jawaban menggunakan Markdown yang rapi.`;
+            const prompt = `Anda adalah psikolog hubungan. Berdasarkan data psikologis pengguna ${app.test.state.currentUser} ini: ${JSON.stringify(combinedResults)}, jelaskan bagaimana karakternya dalam hubungan, deskripsikan karakter pasangan ideal, dan berikan 3 tips hubungan. Gunakan bahasa empatik dan format Markdown.`;
             app.test.callGeminiAPI(prompt, null, app.test.displayRomanceRecommendation);
         };
 
@@ -1182,7 +923,6 @@
             app.test.state.savedResults = resultsData ? JSON.parse(resultsData) : {};
         };
 
-        // --- START THE APP ---
         document.addEventListener('DOMContentLoaded', app.init);
     </script>
 </body>
