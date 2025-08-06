@@ -85,7 +85,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInAnonymously, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDHmD9ePY5KMLUPYD-gLkiHsr1a1nZSAok",
@@ -99,10 +99,21 @@
         window.app = {
             services: {},
             state: { currentUser: null },
-            init() {
+            async init() {
                 const firebaseApp = initializeApp(firebaseConfig);
                 app.services.auth = getAuth(firebaseApp);
                 app.services.db = getFirestore(firebaseApp);
+
+                try {
+                    await enableIndexedDbPersistence(app.services.db);
+                } catch (err) {
+                    if (err.code == 'failed-precondition') {
+                        console.warn("Persistence failed: Multiple tabs open");
+                    } else if (err.code == 'unimplemented') {
+                        console.warn("Persistence not available in this browser.");
+                    }
+                }
+
                 app.auth.setupListeners();
                 app.ui.renderInitialUI();
                 app.ui.setupListeners();
@@ -121,8 +132,8 @@
                         <div class="space-y-4">
                             <div><label for="name-input" class="block text-sm font-medium text-gray-700">Nama Lengkap</label><input type="text" id="name-input" placeholder="Masukkan nama lengkap Anda" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"></div>
                             <div><label for="token-input" class="block text-sm font-medium text-gray-700">Token Akses</label><input type="tel" id="token-input" placeholder="Masukkan 6 digit token" maxlength="6" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"></div>
-                            <button id="login-btn" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300">Mulai Sesi</button>
-                            <p id="auth-feedback" class="text-center text-sm text-red-600 h-4"></p>
+                            <button id="login-btn" class="w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300">Mulai Sesi</button>
+                            <p id="auth-feedback" class="text-center text-sm text-gray-600 h-4 flex items-center justify-center"></p>
                         </div>
                     </div>
                 </div>
@@ -193,19 +204,33 @@
             if (!name || !token) { feedbackEl.textContent = 'Nama dan Token harus diisi.'; return; }
             if (token.length !== 6) { feedbackEl.textContent = 'Token harus terdiri dari 6 digit.'; return; }
 
-            feedbackEl.textContent = 'Memvalidasi akses...';
+            feedbackEl.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Memvalidasi akses...';
+            feedbackEl.classList.remove('text-red-600');
             loginBtn.disabled = true;
 
+            const timeoutPromise = new Promise((_, reject) => 
+                setTimeout(() => reject(new Error("Timeout")), 20000)
+            );
+
             try {
-                const tokenDocRef = doc(app.services.db, "accessTokens", token);
-                const tokenDocSnap = await getDoc(tokenDocRef);
-                if (!tokenDocSnap.exists()) throw new Error('Token yang Anda masukkan tidak valid.');
+                const loginProcess = async () => {
+                    const tokenDocRef = doc(app.services.db, "accessTokens", token);
+                    const tokenDocSnap = await getDoc(tokenDocRef);
+                    if (!tokenDocSnap.exists()) throw new Error('Token yang Anda masukkan tidak valid.');
+                    sessionStorage.setItem('userName', name);
+                    await signInAnonymously(app.services.auth);
+                };
                 
-                sessionStorage.setItem('userName', name);
-                await signInAnonymously(app.services.auth);
+                await Promise.race([loginProcess(), timeoutPromise]);
+
             } catch (error) {
                 console.error("Token Login Error:", error);
-                feedbackEl.textContent = error.message;
+                if (error.message === "Timeout") {
+                    feedbackEl.textContent = "Koneksi terlalu lama. Cek internet & coba lagi.";
+                } else {
+                    feedbackEl.textContent = error.message;
+                }
+                feedbackEl.classList.add('text-red-600');
                 sessionStorage.removeItem('userName');
                 loginBtn.disabled = false;
             }
@@ -353,7 +378,6 @@
 
         app.test.init = (userName) => {
             app.test.state.currentUser = userName;
-            document.getElementById('user-name-display').textContent = app.test.state.currentUser;
             app.test.loadAppData();
             app.test.updateDashboard();
             app.ui.showScreen('dashboard-screen');
@@ -735,8 +759,8 @@
         };
         
         app.test.callGeminiAPI = async (prompt, results, callback) => {
-            const apiKey = "MASUKKAN_API_KEY_ANDA_DI_SINI"; 
-            if (apiKey === "MASUKKAN_API_KEY_ANDA_DI_SINI") {
+            const apiKey = "AIzaSyDWCrd0lfmX75fPr11l74g7wgrnSi3PFhM"; 
+            if (apiKey === "AIzaSyDWCrd0lfmX75fPr11l74g7wgrnSi3PFhM") {
                 const errorText = "API Key belum dimasukkan. Silakan edit file index.html dan masukkan API Key Anda.";
                 app.test.displayResults({ analysis: errorText, summary: results, testName: app.test.state.currentTest.name });
                 return;
