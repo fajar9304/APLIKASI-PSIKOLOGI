@@ -32,7 +32,6 @@
         .riasec-label { transition: all 0.2s ease-in-out; border: 1px solid #e5e7eb; }
         input.suka-radio:checked + .riasec-label { background-image: linear-gradient(to top right, #34d399, #15803d); color: white; font-weight: 600; transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); border: none; }
         input.tidaksuka-radio:checked + .riasec-label { background-image: linear-gradient(to top right, #f87171, #b91c1c); color: white; font-weight: 600; transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); border: none; }
-        /* Custom alert box */
         .custom-alert-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
         .custom-alert-box { background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; max-width: 90%; width: 400px; transform: scale(0.95); transition: transform 0.3s ease; }
         .custom-alert-overlay.visible { opacity: 1; pointer-events: auto; }
@@ -203,7 +202,7 @@
                     </div>
                 </div>
                 <div class="text-center">
-                    <img id="cert-qr-code" src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=valid" alt="QR Code Validasi">
+                    <img id="cert-qr-code" src="" alt="QR Code Validasi" crossorigin="anonymous">
                     <p class="text-xs text-gray-500 mt-2">Validasi melalui QR Code</p>
                 </div>
             </div>
@@ -940,7 +939,7 @@
                     const userAnswer = userAnswers[i];
                     let isCorrect = false;
                     if (q.options) {
-                        const selectedOptionText = q.options[userAnswer];
+                        const selectedOptionText = q.options.find(opt => (opt.value !== undefined ? opt.value : opt) == userAnswer)?.text || userAnswer;
                         isCorrect = String(selectedOptionText || '').toLowerCase() === String(q.answer).toLowerCase();
                     } else {
                         if (Array.isArray(q.answer)) isCorrect = q.answer.some(ans => String(ans).toLowerCase().trim() === String(userAnswer).toLowerCase().trim());
@@ -978,14 +977,31 @@
             app.test.callGeminiAPI(promptText, resultsSummary, app.test.displayResults);
         };
         
+        // =======================================================
+        // PERINGATAN: METODE INI TIDAK AMAN UNTUK PRODUKSI
+        // =======================================================
+        // Metode ini mengekspos API Key Anda ke publik.
+        // Gunakan hanya untuk tujuan MVP/pengujian pribadi.
         app.test.callGeminiAPI = async (prompt, results, callback) => {
-            const apiKey = ""; // Dibiarkan kosong, akan diinjeksi oleh environment secara aman.
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-            const payload = { contents: [{ parts: [{ text: prompt }] }] };
+            // GANTI DENGAN API KEY ANDA DI SINI
+            const apiKey = "AIzaSyBGR72HYabTI1UqR-hXWMuAWaZe4KHTDsM"; 
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.0-pro:generateContent?key=${apiKey}`;
+            
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }]
+            };
 
             try {
-                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
                 const data = await response.json();
                 const analysisText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Maaf, terjadi kesalahan saat AI menganalisis hasil.";
                 
@@ -999,7 +1015,7 @@
                     callback(analysisText);
                 }
             } catch (error) {
-                console.error("Error calling Gemini API:", error);
+                console.error("Error calling Gemini API directly:", error);
                 const errorText = `Terjadi masalah koneksi saat menghubungi AI. Pastikan Anda terhubung ke internet dan coba lagi. Error: ${error.message}`;
                 if (callback === app.test.displayResults) {
                     app.test.displayResults({ analysis: errorText, summary: results, testName: app.test.state.currentTest.name });
@@ -1065,15 +1081,24 @@
             scoresContainer.innerHTML = scoreHTML;
 
             const validationUrl = `https://example.com/validate?user=${app.test.state.currentUser}&test=${testName}&date=${date}`;
-            document.getElementById('cert-qr-code').src = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(validationUrl)}`;
-
-            const certElement = document.getElementById('certificate');
-            html2canvas(certElement).then(canvas => {
-                const link = document.createElement('a');
-                link.download = `Sertifikat-${app.test.state.currentUser.replace(' ', '_')}-${testName.replace(' ', '_')}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-            });
+            const qrCodeEl = document.getElementById('cert-qr-code');
+            qrCodeEl.src = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(validationUrl)}`;
+            
+            qrCodeEl.onload = () => {
+                const certElement = document.getElementById('certificate');
+                html2canvas(certElement, { useCORS: true }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = `Sertifikat-${app.test.state.currentUser.replace(' ', '_')}-${testName.replace(' ', '_')}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                }).catch(err => {
+                    console.error("html2canvas error:", err);
+                    app.ui.showCustomAlert("Gagal membuat sertifikat. Silakan coba lagi.");
+                });
+            };
+            qrCodeEl.onerror = () => {
+                 app.ui.showCustomAlert("Gagal memuat QR Code untuk sertifikat.");
+            };
         };
 
         app.test.viewResult = (testName) => {
