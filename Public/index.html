@@ -634,8 +634,10 @@
                         </label>
                     </div>`;
                 
-                questionCard.querySelector('input[name^="riasec-"]')?.addEventListener('change', (e) => {
-                    app.test.state.userAnswers[q.originalIndex] = parseInt(e.target.value);
+                questionCard.addEventListener('change', (e) => {
+                    if(e.target.name === `riasec-${q.originalIndex}`){
+                        app.test.state.userAnswers[q.originalIndex] = parseInt(e.target.value);
+                    }
                 });
                 container.appendChild(questionCard);
             });
@@ -674,9 +676,11 @@
             optionsHTML += '</div>';
             
             container.innerHTML = questionHTML + optionsHTML;
-            container.querySelector('input[type="radio"]')?.addEventListener('change', (e) => {
-                const value = e.target.value;
-                app.test.state.userAnswers[currentQuestionIndex] = isNaN(value) ? value : parseInt(value);
+            container.addEventListener('change', (e) => {
+                if(e.target.name === `question_${currentQuestionIndex}`){
+                    const value = e.target.value;
+                    app.test.state.userAnswers[currentQuestionIndex] = isNaN(value) ? value : parseInt(value);
+                }
             });
 
             app.test.updateNavButtons();
