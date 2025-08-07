@@ -170,10 +170,13 @@
         };
 
         app.ui.showScreen = (screenId) => {
+            if (screenId !== 'test-screen' && app.test.state && app.test.state.testTimerInterval) {
+                clearInterval(app.test.state.testTimerInterval);
+                app.test.state.testTimerInterval = null;
+            }
             document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active-screen'));
             const screenEl = document.getElementById(screenId);
             if(screenEl) screenEl.classList.add('active-screen');
-            if (app.test.state && app.test.state.testTimerInterval) clearInterval(app.test.state.testTimerInterval);
         };
         
         app.ui.showCustomAlert = (message) => {
@@ -507,13 +510,16 @@
                         <button id="submit-btn" class="hidden w-full bg-green-600 text-white font-bold py-3 px-4 rounded-full hover:bg-green-700 transition duration-300 transform hover:scale-105">Lihat Hasil Tes</button>
                     </div>
                 </div>`;
-
-            const timerEl = testScreen.querySelector('#time-remaining');
+            
+            app.ui.showScreen('test-screen');
+            const timerEl = document.getElementById('time-remaining');
+            
             app.test.state.testTimerInterval = setInterval(() => {
                 timeLeft--;
-                timerEl.textContent = app.test.formatTime(timeLeft);
+                if(timerEl) timerEl.textContent = app.test.formatTime(timeLeft);
                 if (timeLeft <= 0) {
                     clearInterval(app.test.state.testTimerInterval);
+                    app.test.state.testTimerInterval = null;
                     app.test.autoSubmitTest();
                 }
             }, 1000);
@@ -521,7 +527,6 @@
             if (app.test.state.currentTest.testType === 'disc') app.test.renderDiscTest();
             else if (app.test.state.currentTest.testType === 'riasec') app.test.renderRIASECPage();
             else app.test.renderQuestion();
-            app.ui.showScreen('test-screen');
         };
 
         app.test.autoSubmitTest = () => {
@@ -662,7 +667,12 @@
             const optionsToUse = questionData.options || currentTest.options;
             let optionsHTML = '<div class="flex flex-col items-center space-y-3">';
             if (optionsToUse) {
-                optionsToUse.forEach((option, index) => {
+                let options = [...optionsToUse];
+                if (currentTest.name === 'Tes Komprehensif Premium') {
+                    options.sort(() => Math.random() - 0.5);
+                }
+
+                options.forEach((option, index) => {
                     const optionValue = option.value !== undefined ? option.value : option;
                     const optionId = `q${currentQuestionIndex}_option${index}`;
                     const isChecked = userAnswers[currentQuestionIndex] !== undefined && String(userAnswers[currentQuestionIndex]) == String(optionValue);
