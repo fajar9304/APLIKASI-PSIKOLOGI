@@ -955,14 +955,15 @@
                 promptText += `Data hasil Tes Minat Bakat Holland (RIASEC) adalah Kode Holland: **${hollandCode}**. Buat bagian berikut: [IKON:fa-file-alt] Deskripsi Tipe Minat Dominan, [IKON:fa-building] Lingkungan Kerja Ideal, dan [IKON:fa-briefcase] Rekomendasi Karir Sesuai Minat.`;
             }
 
-            app.test.callGeminiAPI(promptText, resultsSummary, app.test.displayResults);
+            app.test.callGeminiAPI(promptText, resultsSummary, app.test.displayResults, app.test.state.currentTest.name);
         };
         
-        app.test.callGeminiAPI = async (prompt, results, callback) => {
+        app.test.callGeminiAPI = async (prompt, results, callback, testKey = null) => {
+            const nameForTest = testKey || app.test.state.currentTest.name;
             const apiKey = "AIzaSyDWCrd0lfmX75fPr11l74g7wgrnSi3PFhM"; 
             if (apiKey === "MASUKKAN_API_KEY_ANDA_DI_SINI") {
                 const errorText = "API Key belum dimasukkan. Silakan edit file index.html dan masukkan API Key Anda.";
-                app.test.displayResults({ analysis: errorText, summary: results, testName: app.test.state.currentTest.name });
+                app.test.displayResults({ analysis: errorText, summary: results, testName: nameForTest });
                 return;
             }
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
@@ -976,17 +977,17 @@
                 }
                 const data = await response.json();
                 const analysisText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Maaf, terjadi kesalahan saat AI menganalisis hasil.";
-                const resultData = { summary: results, analysis: analysisText, date: new Date().toLocaleString('id-ID'), testName: app.test.state.currentTest.name };
+                const resultData = { summary: results, analysis: analysisText, date: new Date().toLocaleString('id-ID'), testName: nameForTest };
                 
                 if(results) { // Only save if it's a test result, not a career reco
-                    app.test.state.savedResults[app.test.state.currentTest.name] = resultData;
+                    app.test.state.savedResults[nameForTest] = resultData;
                     app.test.saveResultsToStorage();
                 }
                 callback(resultData);
             } catch (error) {
                 console.error("Error calling Gemini API directly:", error);
                 const errorText = `Terjadi masalah koneksi saat menghubungi AI. Pastikan Anda terhubung ke internet dan coba lagi. Error: ${error.message}`;
-                callback({ analysis: errorText, summary: results, testName: app.test.state.currentTest.name });
+                callback({ analysis: errorText, summary: results, testName: nameForTest });
             }
         };
 
@@ -1156,7 +1157,7 @@
             const bakatResult = app.test.state.savedResults['Minat Bakat Premium'].summary;
             
             const prompt = `Anda adalah seorang konsultan karir ahli. Berdasarkan data psikologis pengguna bernama ${app.test.state.currentUser} ini: Skor IQ ${iqResult.iqScore} (Kategori: ${iqResult.iqCategory}) dan Kode Minat Holland ${bakatResult.hollandCode}, berikan analisis karir yang holistik dan terperinci dalam BAHASA INDONESIA. Buat bagian-bagian berikut: [IKON:fa-user-tie] Profil Karir Anda, [IKON:fa-lightbulb] Analisis Sinergi (bagaimana IQ dan Minat saling mendukung), dan [IKON:fa-ranking-star] 5 Rekomendasi Karir Teratas (jelaskan 'Mengapa Cocok' untuk setiap karir dengan menggabungkan kedua hasil tes). Gunakan format [IKON:nama-ikon] untuk setiap judul bagian. Jangan gunakan tanda '*' untuk daftar. Di akhir laporan, tuliskan: "Laporan ini disusun oleh: Fajar, S.Psi".`;
-            app.test.callGeminiAPI(prompt, null, app.test.displayCareerRecommendation);
+            app.test.callGeminiAPI(prompt, null, app.test.displayCareerRecommendation, 'Rekomendasi Karir');
         };
 
         app.test.displayCareerRecommendation = (result) => {
