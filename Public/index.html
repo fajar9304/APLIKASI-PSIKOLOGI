@@ -923,7 +923,7 @@
         app.test.processResultsAndGenerateAnalysis = () => {
             const { currentTest, currentUser, userAnswers } = app.test.state;
             let resultsSummary = {};
-            let promptText = `Anda adalah seorang konsultan psikologi. Pengguna bernama ${currentUser} telah menyelesaikan tes. Buat laporan psikologis yang profesional, tajam, dan bisa ditindaklanjuti dalam BAHASA INDONESIA. Gunakan format berikut untuk setiap judul bagian: [IKON:nama-ikon-fontawesome] Judul Bagian. Contoh: [IKON:fa-user-circle] Profil Umum. Jangan gunakan tanda '*' untuk daftar, cukup baris baru biasa. Di akhir laporan, tuliskan: "Laporan ini disusun oleh: Fajar, S.Psi". `;
+            let promptText = `Anda adalah seorang konsultan psikologi. Pengguna bernama ${currentUser} telah menyelesaikan tes. Buat laporan psikologis yang profesional, tajam, dan bisa ditindaklanjuti dalam BAHASA INDONESIA. Gunakan format berikut untuk setiap judul bagian: [IKON:nama-ikon-fontawesome] Judul Bagian. Contoh: [IKON:fa-user-circle] Profil Umum. PENTING: Jangan gunakan karakter markdown seperti '*' atau '#'. Untuk menyorot informasi penting, apit teks dengan tag <u> dan </u>. Contoh: <u>Teks Penting</u>. Gunakan baris baru biasa untuk daftar. Di akhir laporan, tuliskan: "Laporan ini disusun oleh: Fajar, S.Psi". `;
             
             if (currentTest.name === 'Kognitif Premium') {
                 let correctAnswers = 0;
@@ -952,7 +952,7 @@
                 const sortedScores = Object.entries(scores).sort(([,a],[,b]) => b-a);
                 const hollandCode = sortedScores.slice(0, 3).map(item => item[0]).join('');
                 resultsSummary = { hollandCode: hollandCode, scores: scores };
-                promptText += `Data hasil Tes Minat Bakat Holland (RIASEC) adalah Kode Holland: **${hollandCode}**. Buat bagian berikut: [IKON:fa-file-alt] Deskripsi Tipe Minat Dominan, [IKON:fa-building] Lingkungan Kerja Ideal, dan [IKON:fa-briefcase] Rekomendasi Karir Sesuai Minat.`;
+                promptText += `Data hasil Tes Minat Bakat Holland (RIASEC) adalah Kode Holland: <u>${hollandCode}</u>. Buat bagian berikut: [IKON:fa-file-alt] Deskripsi Tipe Minat Dominan, [IKON:fa-building] Lingkungan Kerja Ideal, dan [IKON:fa-briefcase] Rekomendasi Karir Sesuai Minat.`;
             }
 
             app.test.callGeminiAPI(promptText, resultsSummary, app.test.displayResults, app.test.state.currentTest.name);
@@ -1002,6 +1002,9 @@
                 contentDiv.innerHTML = app.test.renderIQReport(resultData);
             } else {
                 let formattedText = analysis
+                    .replace(/\*\*(.*?)\*\*/g, '<u>$1</u>') // Replace **text** with <u>text</u>
+                    .replace(/\*(.*?)\*/g, '<u>$1</u>')   // Replace *text* with <u>text</u>
+                    .replace(/^#+\s/gm, '')              // Remove leading #
                     .replace(/\[IKON:(.*?)\]\s(.*?)\n/g, (match, icon, title) => {
                         return `<div class="flex items-center text-xl font-bold text-gray-800 mt-6 mb-3"><i class="fas ${icon.trim()} text-indigo-500 mr-3 w-6 text-center"></i><h3>${title.trim()}</h3></div>`;
                     })
@@ -1054,7 +1057,9 @@
                 const icon = parts[0];
                 const contentParts = parts[1].split('\n');
                 const title = contentParts[0].trim();
-                const content = contentParts.slice(1).join('<br>');
+                const content = contentParts.slice(1).join('<br>')
+                    .replace(/\*\*(.*?)\*\*/g, '<u>$1</u>')
+                    .replace(/\*(.*?)\*/g, '<u>$1</u>');
 
                 return `
                     <details class="border-b" open>
@@ -1156,7 +1161,7 @@
             const iqResult = app.test.state.savedResults['Kognitif Premium'].summary;
             const bakatResult = app.test.state.savedResults['Minat Bakat Premium'].summary;
             
-            const prompt = `Anda adalah seorang konsultan karir ahli. Berdasarkan data psikologis pengguna bernama ${app.test.state.currentUser} ini: Skor IQ ${iqResult.iqScore} (Kategori: ${iqResult.iqCategory}) dan Kode Minat Holland ${bakatResult.hollandCode}, berikan analisis karir yang holistik dan terperinci dalam BAHASA INDONESIA. Buat bagian-bagian berikut: [IKON:fa-user-tie] Profil Karir Anda, [IKON:fa-lightbulb] Analisis Sinergi (bagaimana IQ dan Minat saling mendukung), dan [IKON:fa-ranking-star] 5 Rekomendasi Karir Teratas (jelaskan 'Mengapa Cocok' untuk setiap karir dengan menggabungkan kedua hasil tes). Gunakan format [IKON:nama-ikon] untuk setiap judul bagian. Jangan gunakan tanda '*' untuk daftar. Di akhir laporan, tuliskan: "Laporan ini disusun oleh: Fajar, S.Psi".`;
+            const prompt = `Anda adalah seorang konsultan karir ahli. Berdasarkan data psikologis pengguna bernama ${app.test.state.currentUser} ini: Skor IQ ${iqResult.iqScore} (Kategori: ${iqResult.iqCategory}) dan Kode Minat Holland ${bakatResult.hollandCode}, berikan analisis karir yang holistik dan terperinci dalam BAHASA INDONESIA. Buat bagian-bagian berikut: [IKON:fa-user-tie] Profil Karir Anda, [IKON:fa-lightbulb] Analisis Sinergi (bagaimana IQ dan Minat saling mendukung), dan [IKON:fa-ranking-star] 5 Rekomendasi Karir Teratas (jelaskan 'Mengapa Cocok' untuk setiap karir dengan menggabungkan kedua hasil tes). Gunakan format [IKON:nama-ikon] untuk setiap judul bagian. PENTING: Jangan gunakan karakter markdown seperti '*' atau '#'. Untuk menyorot informasi penting, apit teks dengan tag <u> dan </u>. Contoh: <u>Teks Penting</u>. Gunakan baris baru biasa untuk daftar. Di akhir laporan, tuliskan: "Laporan ini disusun oleh: Fajar, S.Psi".`;
             app.test.callGeminiAPI(prompt, null, app.test.displayCareerRecommendation, 'Rekomendasi Karir');
         };
 
@@ -1166,6 +1171,9 @@
             const contentDiv = document.getElementById('career-content');
             
             let formattedText = result.analysis
+                .replace(/\*\*(.*?)\*\*/g, '<u>$1</u>') // Replace **text** with <u>text</u>
+                .replace(/\*(.*?)\*/g, '<u>$1</u>')   // Replace *text* with <u>text</u>
+                .replace(/^#+\s/gm, '')              // Remove leading #
                 .replace(/\[IKON:(.*?)\]\s(.*?)\n/g, (match, icon, title) => `<div class="flex items-center text-xl font-bold text-gray-800 mt-6 mb-3"><i class="fas ${icon.trim()} text-indigo-500 mr-3 w-6 text-center"></i><h3>${title.trim()}</h3></div>`)
                 .replace(/Laporan ini disusun oleh: Fajar, S.Psi/g, '<div class="mt-8 pt-4 border-t text-right text-sm text-gray-500"><em>Laporan ini disusun oleh:<br><strong>Fajar, S.Psi</strong></em></div>')
                 .replace(/\n/g, '<br>');
