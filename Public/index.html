@@ -451,7 +451,8 @@
                 `;
             }
             
-            const allTestsDone = app.test.state.savedResults['Kognitif Premium'] && app.test.state.savedResults['Minat Bakat Premium'];
+            const requiredKeys = Object.values(app.test.data.allTests).map(test => test.premiumKey);
+            const allTestsDone = requiredKeys.every(key => app.test.state.savedResults[key]);
             const recoCardState = allTestsDone ? 'cursor-pointer' : 'opacity-50 cursor-not-allowed';
             const recoCardDesc = allTestsDone ? 'Lihat analisis gabungan dari semua tes yang telah Anda selesaikan.' : 'Selesaikan Tes IQ dan Tes Minat Bakat untuk membuka fitur ini.';
 
@@ -608,9 +609,27 @@
                         <p class="text-lg mb-4 text-center">${taskText}</p>
                     </div>`;
                 
-                let optionsHTML = `<div id="options-container-wrapper" class="hidden flex flex-col items-center space-y-3 w-full max-w-md">
-                                <input type="text" id="text-input-${currentQuestionIndex}" class="block w-full text-center p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="Ketik jawaban Anda di sini" value="${userAnswers[currentQuestionIndex] || ''}">
+                let optionsHTML = '<div id="options-container-wrapper" class="hidden flex flex-col items-center space-y-3 w-full max-w-md">';
+                
+                if (questionData.options) {
+                    let options = [...questionData.options];
+                    options.sort(() => Math.random() - 0.5);
+
+                    options.forEach((option, index) => {
+                        const optionValue = option.value !== undefined ? option.value : option;
+                        const optionId = `q${currentQuestionIndex}_option${index}`;
+                        const isChecked = userAnswers[currentQuestionIndex] !== undefined && String(userAnswers[currentQuestionIndex]) == String(optionValue);
+                        optionsHTML += `
+                            <div class="w-full">
+                                <input type="radio" id="${optionId}" name="question_${currentQuestionIndex}" value="${optionValue}" class="hidden peer" ${isChecked ? 'checked' : ''}>
+                                <label for="${optionId}" class="block w-full text-center p-3 border border-gray-300 rounded-lg cursor-pointer peer-checked:bg-indigo-600 peer-checked:text-white peer-checked:border-indigo-600 hover:bg-indigo-50">${option.text || option}</label>
                             </div>`;
+                    });
+                } else {
+                    optionsHTML += `<input type="text" id="text-input-${currentQuestionIndex}" class="block w-full text-center p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="Ketik jawaban Anda di sini" value="${userAnswers[currentQuestionIndex] || ''}">`;
+                }
+                
+                optionsHTML += '</div>';
                 
                 container.innerHTML = questionHTML + optionsHTML;
 
@@ -631,9 +650,9 @@
                             if (memoryStimulus) memoryStimulus.style.display = 'none';
                             if (memoryTask) memoryTask.style.display = 'block';
                             if (optionsWrapper) optionsWrapper.style.display = 'flex';
+                            
                             if (textInput) {
                                 textInput.focus();
-                                // BUG FIX: Attach listener and set button state here after element is created
                                 if (nextBtn) {
                                     nextBtn.disabled = !textInput.value.trim();
                                 }
@@ -651,7 +670,7 @@
             
             if (questionData.section === 3 && (currentTest.questions[currentQuestionIndex-1]?.section !== 3)) {
                 app.ui.showCustomAlert("Perhatian! Bagian tes memori akan dimulai. Anda akan diberi waktu beberapa detik untuk menghafal informasi sebelum menjawab.", startMemoryCountdown);
-            } else if (currentTest.testType === 'iq' && questionData.section === 3 && !questionData.options) {
+            } else if (currentTest.testType === 'iq' && questionData.section === 3 && questionData.q.includes('Hafalkan:')) {
                 startMemoryCountdown();
             } else {
                 let questionHTML = `<p class="text-lg sm:text-xl mb-4 text-center">${questionData.q}</p>`;
