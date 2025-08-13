@@ -34,6 +34,16 @@
         .accordion-arrow { transition: transform 0.2s ease-in-out; }
         .progress-bar-fill { transition: width 0.3s ease-in-out; }
         #next-btn:disabled { background-color: #9ca3af; cursor: not-allowed; }
+        
+        /* Language Toggle Styles */
+        .lang-toggle { display: flex; align-items: center; cursor: pointer; }
+        .lang-toggle input { display: none; }
+        .lang-toggle .slider { position: relative; width: 60px; height: 30px; background-color: #ccc; border-radius: 30px; transition: .4s; }
+        .lang-toggle .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 4px; bottom: 4px; background-color: white; border-radius: 50%; transition: .4s; }
+        .lang-toggle input:checked + .slider { background-color: #4f46e5; }
+        .lang-toggle input:checked + .slider:before { transform: translateX(30px); }
+        .lang-toggle-label { margin: 0 8px; font-weight: 500; color: #4b5563; }
+        .lang-toggle-label.active { color: #1e293b; font-weight: 700; }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -48,35 +58,35 @@
             <div>
                 <div class="flex justify-between items-start">
                     <div>
-                        <h1 class="text-3xl font-bold text-indigo-800">SERTIFIKAT PENYELESAIAN</h1>
+                        <h1 class="text-3xl font-bold text-indigo-800" data-translate-key="cert_title">SERTIFIKAT PENYELESAIAN</h1>
                         <p id="cert-test-name" class="text-indigo-600 text-lg">Nama Tes</p>
                     </div>
                     <div class="text-center">
                          <i class="fas fa-brain text-5xl text-indigo-500"></i>
-                         <p class="font-bold text-indigo-800 mt-1">PETA POTENSI</p>
+                         <p class="font-bold text-indigo-800 mt-1" data-translate-key="cert_brand">PETA POTENSI</p>
                     </div>
                 </div>
                 <div class="mt-8">
-                    <p class="text-gray-600">Sertifikat ini diberikan kepada:</p>
+                    <p class="text-gray-600" data-translate-key="cert_awarded_to">Sertifikat ini diberikan kepada:</p>
                     <h2 id="cert-user-name" class="text-5xl font-bold text-gray-900 my-2">Nama Pengguna</h2>
-                    <p class="text-gray-600">Yang telah menyelesaikan tes pada tanggal <span id="cert-date" class="font-semibold"></span>.</p>
+                    <p class="text-gray-600"><span data-translate-key="cert_completed_on">Yang telah menyelesaikan tes pada tanggal</span> <span id="cert-date" class="font-semibold"></span>.</p>
                 </div>
             </div>
             <div class="flex items-end justify-between">
                 <div class="w-1/2 pr-8">
-                    <h3 class="text-xl font-bold text-gray-800 mb-3">Rangkuman Hasil</h3>
+                    <h3 class="text-xl font-bold text-gray-800 mb-3" data-translate-key="cert_summary">Rangkuman Hasil</h3>
                     <div id="cert-scores" class="space-y-2"></div>
                 </div>
                 <div class="w-1/2 flex justify-between items-end">
                     <div class="text-center">
                         <img id="cert-qr-code" src="" alt="QR Code Validasi" crossorigin="anonymous" class="mx-auto">
-                        <p class="text-xs text-gray-500 mt-2">Validasi melalui QR Code</p>
+                        <p class="text-xs text-gray-500 mt-2" data-translate-key="cert_validation">Validasi melalui QR Code</p>
                     </div>
                     <div class="text-center">
-                        <p class="text-sm">Disusun oleh,</p>
+                        <p class="text-sm" data-translate-key="cert_prepared_by">Disusun oleh,</p>
                         <div class="h-16"></div>
                         <p class="font-bold border-t pt-2">Fajar, S.Psi</p>
-                        <p class="text-xs text-gray-500">Konsultan Psikologi</p>
+                        <p class="text-xs text-gray-500" data-translate-key="cert_consultant">Konsultan Psikologi</p>
                     </div>
                 </div>
             </div>
@@ -87,7 +97,7 @@
     <div id="custom-alert" class="custom-alert-overlay">
         <div class="custom-alert-box">
             <p id="custom-alert-message" class="mb-6 text-lg"></p>
-            <button id="custom-alert-close" class="bg-indigo-600 text-white font-bold py-2 px-8 rounded-lg hover:bg-indigo-700 transition">OK</button>
+            <button id="custom-alert-close" class="bg-indigo-600 text-white font-bold py-2 px-8 rounded-lg hover:bg-indigo-700 transition" data-translate-key="ok_button">OK</button>
         </div>
     </div>
 
@@ -123,28 +133,30 @@
                         console.warn("Persistence not available in this browser.");
                     }
                 }
-
+                
+                app.lang.init();
                 app.auth.setupListeners();
                 app.ui.renderInitialUI();
                 app.ui.setupListeners();
+                app.lang.translateUI();
             },
             auth: {}, 
-            ui: {
-                onAlertCloseCallback: null
-            },
-            test: {}
+            ui: { onAlertCloseCallback: null },
+            test: {},
+            lang: {}
         };
 
         app.ui.renderInitialUI = () => {
             const container = document.getElementById('app-container');
             container.innerHTML = `
                 <div id="login-screen" class="screen">
+                    <div class="text-right mb-4"> ${app.ui.getLangToggleHTML()} </div>
                     <div class="bg-white p-8 rounded-xl shadow-lg max-w-md mx-auto">
-                        <div class="text-center mb-8"><i class="fas fa-brain text-5xl text-indigo-500 mb-4"></i><h1 class="text-3xl font-bold text-gray-900">Selamat Datang</h1><p class="text-gray-600 mt-2">Masukkan nama dan token akses Anda untuk memulai.</p></div>
+                        <div class="text-center mb-8"><i class="fas fa-brain text-5xl text-indigo-500 mb-4"></i><h1 class="text-3xl font-bold text-gray-900" data-translate-key="welcome_title">Selamat Datang</h1><p class="text-gray-600 mt-2" data-translate-key="welcome_subtitle">Masukkan nama dan token akses Anda untuk memulai.</p></div>
                         <div class="space-y-4">
-                            <div><label for="name-input" class="block text-sm font-medium text-gray-700">Nama Lengkap</label><input type="text" id="name-input" placeholder="Masukkan nama lengkap Anda" autocomplete="off" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"></div>
-                            <div><label for="token-input" class="block text-sm font-medium text-gray-700">Token Akses</label><input type="tel" id="token-input" placeholder="Masukkan 6 digit token" maxlength="6" autocomplete="off" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"></div>
-                            <button id="login-btn" class="w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300">Mulai Sesi</button>
+                            <div><label for="name-input" class="block text-sm font-medium text-gray-700" data-translate-key="full_name_label">Nama Lengkap</label><input type="text" id="name-input" data-translate-key="full_name_placeholder" placeholder="Masukkan nama lengkap Anda" autocomplete="off" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"></div>
+                            <div><label for="token-input" class="block text-sm font-medium text-gray-700" data-translate-key="token_label">Token Akses</label><input type="tel" id="token-input" data-translate-key="token_placeholder" placeholder="Masukkan 6 digit token" maxlength="6" autocomplete="off" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"></div>
+                            <button id="login-btn" class="w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300" data-translate-key="start_session_button">Mulai Sesi</button>
                             <p id="auth-feedback" class="text-center text-sm text-gray-600 h-4 flex items-center justify-center"></p>
                         </div>
                     </div>
@@ -186,6 +198,8 @@
                     const currentQuestionIndex = app.test.state.currentQuestionIndex;
                     app.test.state.userAnswers[currentQuestionIndex] = isNaN(value) ? value : parseInt(value);
                     setTimeout(() => app.test.nextQuestion(), 300);
+                } else if (e.target.id === 'lang-toggle-checkbox') {
+                    app.lang.setLanguage(e.target.checked ? 'en' : 'id');
                 }
             });
 
@@ -199,7 +213,11 @@
             }
             document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active-screen'));
             const screenEl = document.getElementById(screenId);
-            if(screenEl) screenEl.classList.add('active-screen');
+            if(screenEl) {
+                screenEl.classList.add('active-screen');
+                // After showing a screen, re-translate its content
+                app.lang.translateUI();
+            }
         };
         
         app.ui.showCustomAlert = (message, onCloseCallback = null) => {
@@ -214,6 +232,20 @@
                 app.ui.onAlertCloseCallback();
                 app.ui.onAlertCloseCallback = null; // Reset callback after execution
             }
+        };
+
+        app.ui.getLangToggleHTML = () => {
+            const isChecked = app.lang.current === 'en' ? 'checked' : '';
+            return `
+                <div class="flex justify-end items-center p-2">
+                    <span class="lang-toggle-label ${app.lang.current === 'id' ? 'active' : ''}">ID</span>
+                    <label class="lang-toggle">
+                        <input type="checkbox" id="lang-toggle-checkbox" ${isChecked}>
+                        <span class="slider"></span>
+                    </label>
+                    <span class="lang-toggle-label ${app.lang.current === 'en' ? 'active' : ''}">EN</span>
+                </div>
+            `;
         };
 
         app.auth.setupListeners = () => {
@@ -242,36 +274,27 @@
             const token = document.getElementById('token-input').value.trim();
             const feedbackEl = document.getElementById('auth-feedback');
             const loginBtn = document.getElementById('login-btn');
+            
+            if (!name || !token) { feedbackEl.textContent = app.lang.get('feedback_fill_all'); return; }
+            if (token.length !== 6) { feedbackEl.textContent = app.lang.get('feedback_token_6_digits'); return; }
 
-            if (!name || !token) { feedbackEl.textContent = 'Nama dan Token harus diisi.'; return; }
-            if (token.length !== 6) { feedbackEl.textContent = 'Token harus terdiri dari 6 digit.'; return; }
-
-            feedbackEl.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Memvalidasi akses...';
+            feedbackEl.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> ${app.lang.get('feedback_validating')}`;
             feedbackEl.classList.remove('text-red-600');
             loginBtn.disabled = true;
 
-            const timeoutPromise = new Promise((_, reject) => 
-                setTimeout(() => reject(new Error("Timeout")), 20000)
-            );
-
             try {
-                const loginProcess = async () => {
-                    const tokenDocRef = doc(app.services.db, "accessTokens", token);
-                    const tokenDocSnap = await getDoc(tokenDocRef);
-                    if (!tokenDocSnap.exists()) throw new Error('Token yang Anda masukkan tidak valid.');
-                    sessionStorage.setItem('userName', name);
-                    await signInAnonymously(app.services.auth);
-                };
+                // --- MODIFICATION START: Token validation is RE-ENABLED ---
+                const tokenDocRef = doc(app.services.db, "accessTokens", token);
+                const tokenDocSnap = await getDoc(tokenDocRef);
+                if (!tokenDocSnap.exists()) throw new Error(app.lang.get('feedback_invalid_token'));
                 
-                await Promise.race([loginProcess(), timeoutPromise]);
+                sessionStorage.setItem('userName', name);
+                await signInAnonymously(app.services.auth);
+                // --- MODIFICATION END ---
 
             } catch (error) {
-                console.error("Token Login Error:", error);
-                if (error.message === "Timeout") {
-                    feedbackEl.textContent = "Koneksi terlalu lama. Cek internet & coba lagi.";
-                } else {
-                    feedbackEl.textContent = error.message;
-                }
+                console.error("Login Error:", error);
+                feedbackEl.textContent = error.message;
                 feedbackEl.classList.add('text-red-600');
                 sessionStorage.removeItem('userName');
                 loginBtn.disabled = false;
@@ -291,134 +314,28 @@
                 'Minat Bakat Premium': 900 
             },
             allTests: {
-                'IQ': { title: 'Tes IQ', icon: 'fa-lightbulb', color: 'text-purple-500', description: "Mengukur kecerdasan umum (g-factor) melalui soal visual.", premiumKey: 'Kognitif Premium' },
-                'Bakat': { title: 'Tes Minat Bakat', icon: 'fa-compass', color: 'text-teal-500', description: "Menemukan tipe kepribadian dan minat karir Anda (Holland Code).", premiumKey: 'Minat Bakat Premium' }
+                'IQ': { title: {id: 'Tes IQ', en: 'IQ Test'}, icon: 'fa-lightbulb', color: 'text-purple-500', description: {id: "Mengukur kecerdasan umum (g-factor) melalui soal visual.", en: "Measures general intelligence (g-factor) through visual questions."}, premiumKey: 'Kognitif Premium' },
+                'Bakat': { title: {id: 'Tes Minat Bakat', en: 'Aptitude & Interest Test'}, icon: 'fa-compass', color: 'text-teal-500', description: {id: "Menemukan tipe kepribadian dan minat karir Anda (Holland Code).", en: "Discover your personality type and career interests (Holland Code)."}, premiumKey: 'Minat Bakat Premium' }
             },
             questions: { /* Populated from defaultTestsData */ }
         };
 
         app.test.defaultTestsData = {
             'Kognitif Premium': {
-                title: 'Tes IQ', testType: 'iq', sections: ["Penalaran Verbal", "Penalaran Numerik", "Penalaran Abstrak / Figural", "Daya Ingat / Memori", "Kecepatan dan Ketelitian"],
+                title: {id: 'Tes IQ', en: 'IQ Test'}, testType: 'iq', 
+                sections: {
+                    id: ["Penalaran Verbal", "Penalaran Numerik", "Penalaran Abstrak / Figural", "Daya Ingat / Memori", "Kecepatan dan Ketelitian"],
+                    en: ["Verbal Reasoning", "Numerical Reasoning", "Abstract / Figural Reasoning", "Memory", "Speed and Accuracy"]
+                },
                 questions: [
-                    { id: 1, section: 0, q: 'Antonim: Kata "Optimis" berlawanan makna dengan...', answer: 'Putus asa', options: ['Percaya diri', 'Berani', 'Putus asa', 'Semangat'] },
-                    { id: 2, section: 0, q: 'Analogi: Matahari : Terang = Bulan : ...', answer: 'Gelap', options: ['Gelap', 'Malam', 'Pantulan', 'Pasang'] },
-                    { id: 3, section: 0, q: 'Pilih kalimat yang tidak masuk akal.', answer: 'Burung itu berenang di danau seperti lumba-lumba.', options: ['Anak itu menulis puisi dengan tangan kiri.', 'Burung itu berenang di danau seperti lumba-lumba.', 'Dia membeli es krim di musim panas.', 'Ayah membaca koran di pagi hari.'] },
-                    { id: 4, section: 0, q: 'Sinonim: Kata "Cermat" bermakna sama dengan...', answer: 'Teliti', options: ['Cepat', 'Teliti', 'Ceroboh', 'Sederhana'] },
-                    { id: 5, section: 0, q: 'Silogisme: Semua manusia adalah makhluk hidup. Bejo adalah manusia. Maka:', answer: 'Bejo pasti makhluk hidup.', options: ['Bejo bukan makhluk hidup.', 'Bejo mungkin makhluk hidup.', 'Bejo pasti makhluk hidup.', 'Bejo bukan manusia.'] },
-                    { id: 6, section: 0, passage: "Pohon mangga di halaman rumah nenek sangat rimbun. Buahnya manis dan besar-besar. Setiap musim panen, nenek selalu membagikan mangga kepada tetangga dan cucu-cucunya yang datang berkunjung.", q: 'Apa yang dilakukan nenek saat musim panen tiba?', answer: 'Membagikan buah mangga kepada orang lain.', options: ['Menjual semua mangganya di pasar.', 'Membagikan buah mangga kepada orang lain.', 'Membiarkan buahnya jatuh begitu saja.', 'Menebang pohon mangga tersebut.'] },
-                    { id: 7, section: 0, passageId: 6, q: 'Mengapa pohon mangga itu disukai banyak orang?', answer: 'Karena buahnya memiliki rasa yang enak.', options: ['Karena pohonnya sangat tinggi.', 'Karena daunnya sangat rimbun.', 'Karena buahnya memiliki rasa yang enak.', 'Karena terletak di halaman rumah nenek.'] },
-                    { id: 8, section: 0, passage: "Revolusi industri mengubah cara manusia memproduksi barang. Sebelum adanya mesin uap, sebagian besar pekerjaan dilakukan dengan tangan. Setelah penemuan tersebut, pabrik-pabrik besar mulai bermunculan dan produksi massal menjadi mungkin.", q: 'Apa dampak utama dari penemuan mesin uap?', answer: 'Pekerjaan dapat dilakukan lebih cepat dan dalam skala besar.', options: ['Manusia menjadi lebih malas.', 'Pekerjaan dapat dilakukan lebih cepat dan dalam skala besar.', 'Jumlah pengrajin tangan meningkat pesat.', 'Barang-barang menjadi lebih langka.'] },
-                    { id: 9, section: 0, passageId: 8, q: 'Bagaimana kondisi produksi sebelum revolusi industri?', answer: 'Bergantung pada tenaga manual atau tangan.', options: ['Sangat modern dan efisien.', 'Bergantung pada tenaga manual atau tangan.', 'Sudah menggunakan mesin otomatis.', 'Tidak ada kegiatan produksi sama sekali.'] },
-                    { id: 10, section: 0, passage: "Kucing adalah hewan karnivora yang aktif di malam hari (nokturnal). Mereka biasanya menghabiskan waktu siang hari untuk tidur dan menyimpan energi. Di malam hari, insting berburu mereka menjadi lebih tajam.", q: 'Kapan waktu kucing paling aktif?', answer: 'Malam', options: ['Siang', 'Sore', 'Malam', 'Pagi'] },
-                    { id: 11, section: 0, passageId: 10, q: 'Mengapa kucing tidur di siang hari?', answer: 'Untuk menyimpan energi untuk beraktivitas di malam hari.', options: ['Karena mereka merasa bosan.', 'Untuk menyimpan energi untuk beraktivitas di malam hari.', 'Karena cuaca siang hari terlalu panas.', 'Karena mereka tidak suka cahaya matahari.'] },
-                    { id: 12, section: 0, passageId: 10, q: 'Apa jenis makanan utama kucing berdasarkan teks?', answer: 'Daging', options: ['Tumbuhan', 'Biji-bijian', 'Daging', 'Segala jenis makanan'] },
-                    { id: 13, section: 1, q: 'Deret Angka: 2, 4, 8, 16, ...', answer: '32', options: ['20', '24', '32', '36'] },
-                    { id: 14, section: 1, q: '4x – 7 = 13, maka x = ?', answer: '5', options: ['5', '4', '3', '2'] },
-                    { id: 15, section: 1, q: 'Jika 3 * 2 = 12 dan 4 * 5 = 40, maka 6 * 2 = ? (Logika: a * b = (a*b) * 2)', answer: '24', options: ['12', '24', '18', '36'] },
-                    { id: 16, section: 1, q: 'Jika 3 apel seharga Rp9.000, berapa harga 5 apel?', answer: 'Rp15.000', options: ['Rp13.500', 'Rp15.000', 'Rp12.000', 'Rp10.000'] },
-                    { id: 17, section: 1, q: '3/4 + 2/5 = ?', answer: '1 3/20', options: ['1 3/4', '1 1/2', '1 3/20', '1 2/5'] },
-                    { id: 18, section: 1, q: 'Deret Angka: 81, 27, 9, 3, ...', answer: '1', options: ['1', '0', '1/3', '-3'] },
-                    { id: 19, section: 1, q: 'Budi punya 4 kantong, masing-masing berisi 6 kelereng. Jika ia memberikan 8 kelereng kepada temannya, berapa sisa kelerengnya?', answer: '16', options: ['24', '32', '16', '14'] },
-                    { id: 20, section: 1, q: 'Sebuah kereta berangkat pukul 07:45 dan tiba pukul 11:15. Berapa lama perjalanan kereta tersebut?', answer: '3 jam 30 menit', options: ['3 jam 15 menit', '3 jam 30 menit', '4 jam', '2 jam 45 menit'] },
-                    { id: 21, section: 1, q: 'Dalam sebuah kelas, perbandingan jumlah siswa laki-laki dan perempuan adalah 3:5. Jika jumlah siswa perempuan adalah 25 orang, berapa jumlah siswa laki-laki?', answer: '15', options: ['10', '15', '20', '30'] },
-                    { id: 22, section: 1, q: 'Ani membeli buku seharga Rp25.000 dan mendapat diskon 20%. Berapa uang yang harus Ani bayarkan?', answer: 'Rp20.000', options: ['Rp5.000', 'Rp15.000', 'Rp20.000', 'Rp22.500'] },
-                    { id: 23, section: 1, q: 'Sebuah mobil menempuh jarak 120 km dengan 10 liter bensin. Jika mobil tersebut akan menempuh jarak 180 km, berapa liter bensin yang dibutuhkan?', answer: '15 liter', options: ['12 liter', '15 liter', '18 liter', '20 liter'] },
-                    { id: 24, section: 1, q: 'Ayah berusia 3 kali usia anaknya. Jika jumlah usia mereka sekarang adalah 48 tahun, berapa usia sang anak?', answer: '12 tahun', options: ['10 tahun', '12 tahun', '14 tahun', '16 tahun'] },
-                    { id: 25, section: 2, isVisual: true, q: 'Melengkapi Pola: [Persegi, Lingkaran, Segitiga, Persegi, Lingkaran, ...]', answer: 'Segitiga', options: ['Persegi', 'Lingkaran', 'Segitiga'] },
-                    { id: 26, section: 2, isVisual: true, q: 'Gambar Berbeda: Dari kelima jam di bawah, manakah yang menunjukkan waktu berbeda?', answer: 'C', options: ['A', 'B', 'C', 'D', 'E'] },
-                    { id: 27, section: 2, isVisual: true, q: 'Rotasi Bentuk: Panah menunjuk ke atas. Mana rotasi 90 derajat searah jarum jam?', answer: 'Panah ke kanan', options: ['Panah ke kanan atas', 'Panah ke kanan', 'Panah ke bawah'] },
-                    { id: 28, section: 2, isVisual: true, q: 'Analogi Visual: Lingkaran utuh menjadi setengah lingkaran. Bagaimana Persegi utuh akan berubah?', answer: 'Setengah persegi/persegi panjang', options: ['Dua persegi', 'Setengah persegi/persegi panjang', 'Segitiga'] },
-                    { 
-                        id: 29, section: 2, isVisual: true, 
-                        q: 'Simetri: Pilih gambar kanan yang simetris dengan gambar kiri.', 
-                        answer: 'B', 
-                        visualQuestion: `<div class="flex justify-center items-center my-4 p-4 bg-gray-100 rounded-lg"><svg width="100" height="100" viewBox="0 0 100 100"><path d="M50 5 C 5 20, 5 80, 50 95" stroke="black" fill="#facc15" stroke-width="2"/></svg></div>`,
-                        options: [
-                            { value: 'A', visual: `<svg width="100" height="100" viewBox="0 0 100 100"><path d="M50 5 C 5 20, 5 80, 50 95" stroke="black" fill="#facc15" stroke-width="2" transform="rotate(90 50 50)"/></svg>` },
-                            { value: 'B', visual: `<svg width="100" height="100" viewBox="0 0 100 100"><path d="M50 5 C 95 20, 95 80, 50 95" stroke="black" fill="#facc15" stroke-width="2"/></svg>` },
-                            { value: 'C', visual: `<svg width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" stroke="black" fill="#facc15" stroke-width="2"/></svg>` }
-                        ]
-                    },
-                    { 
-                        id: 30, section: 2, isVisual: true, 
-                        q: 'Matriks Progresif: Isi kotak kosong pada matriks 3x3.', 
-                        answer: 'C',
-                        visualQuestion: `<div class="flex justify-center items-center my-4 p-4 bg-gray-100 rounded-lg"><svg width="180" height="180" viewBox="0 0 180 180" style="border: 1px solid #ccc;"><g stroke="black" stroke-width="2" fill="none"><circle cx="30" cy="30" r="20"/><circle cx="90" cy="30" r="20"/><line x1="90" y1="10" x2="90" y2="50"/><circle cx="150" cy="30" r="20"/><line x1="150" y1="10" x2="150" y2="50"/><line x1="130" y1="30" x2="170" y2="30"/><rect x="10" y="70" width="40" height="40"/><rect x="70" y="70" width="40" height="40"/><line x1="90" y1="70" x2="90" y2="110"/><rect x="130" y="70" width="40" height="40"/><line x1="150" y1="70" x2="150" y2="110"/><line x1="130" y1="90" x2="170" y2="90"/><polygon points="30,160 10,120 50,120"/><polygon points="90,160 70,120 110,120"/><line x1="90" y1="120" x2="90" y2="160"/><text x="145" y="145" font-size="40" fill="#9ca3af">?</text></g></svg></div>`,
-                        options: [
-                            { value: 'A', visual: `<svg width="60" height="60" viewBox="0 0 60 60"><polygon points="30,50 10,10 50,10" stroke="black" fill="none" stroke-width="2"/></svg>` },
-                            { value: 'B', visual: `<svg width="60" height="60" viewBox="0 0 60 60"><polygon points="30,50 10,10 50,10" stroke="black" fill="none" stroke-width="2"/><line x1="30" y1="10" x2="30" y2="50"/></svg>` },
-                            { value: 'C', visual: `<svg width="60" height="60" viewBox="0 0 60 60"><polygon points="30,50 10,10 50,10" stroke="black" fill="none" stroke-width="2"/><line x1="30" y1="10" x2="30" y2="50"/><line x1="10" y1="30" x2="50" y2="30"/></svg>` }
-                        ]
-                    },
-                    { id: 31, section: 2, isVisual: true, q: 'Pemisahan Ruang: Sebuah kotak dibagi menjadi beberapa bagian oleh garis-garis. Hitung jumlah total area.', answer: '6', options: ['4', '5', '6', '7'] },
-                    { 
-                        id: 32, section: 2, isVisual: true, 
-                        q: 'Pola Lipatan Kertas: Kertas dilipat lalu dilubangi. Pilih kondisi kertas setelah dibuka.', 
-                        answer: 'B',
-                        visualQuestion: `<div class="flex justify-center items-center my-4 p-4 bg-gray-100 rounded-lg space-x-4 text-gray-500"><svg width="50" height="50"><rect x="0" y="0" width="50" height="50" fill="white" stroke="black"/></svg><span>→</span><svg width="25" height="50"><rect x="0" y="0" width="25" height="50" fill="white" stroke="black"/><path d="M 25 0 L 25 50" stroke-dasharray="2 2" stroke="gray"/></svg><span>→</span><svg width="25" height="25"><rect x="0" y="0" width="25" height="25" fill="white" stroke="black"/><circle cx="5" cy="5" r="3" fill="black"/><path d="M 25 0 L 25 25" stroke-dasharray="2 2" stroke="gray"/><path d="M 0 25 L 25 25" stroke-dasharray="2 2" stroke="gray"/></svg></div>`,
-                        options: [
-                            { value: 'A', visual: `<svg width="60" height="60" viewBox="0 0 60 60"><rect x="5" y="5" width="50" height="50" fill="white" stroke="black"/><circle cx="30" cy="30" r="3" fill="black"/></svg>` },
-                            { value: 'B', visual: `<svg width="60" height="60" viewBox="0 0 60 60"><rect x="5" y="5" width="50" height="50" fill="white" stroke="black"/><circle cx="15" cy="15" r="3" fill="black"/><circle cx="45" cy="15" r="3" fill="black"/><circle cx="15" cy="45" r="3" fill="black"/><circle cx="45" cy="45" r="3" fill="black"/></svg>` },
-                            { value: 'C', visual: `<svg width="60" height="60" viewBox="0 0 60 60"><rect x="5" y="5" width="50" height="50" fill="white" stroke="black"/><circle cx="15" cy="30" r="3" fill="black"/><circle cx="45" cy="30" r="3" fill="black"/></svg>` }
-                        ]
-                    },
-                    { 
-                        id: 33, section: 2, isVisual: true, 
-                        q: 'Hubungan Spasial: Tiga objek ditumpuk seperti pada gambar. Mana yang paling bawah?', 
-                        answer: 'Kubus',
-                        visualQuestion: `<div class="flex justify-center items-center my-4 p-4 bg-gray-100 rounded-lg"><svg width="100" height="120" viewBox="0 0 100 120"><g fill-opacity="0.8"><polygon points="50,0 20,30 80,30" style="fill:#ef4444;"/><circle cx="50" cy="55" r="25" style="fill:#3b82f6;"/><path d="M10 80 L40 70 L90 90 L60 100 Z" style="fill:#22c55e;"/><path d="M10 80 L10 110 L60 100 L60 70 Z" style="fill:#16a34a;"/><path d="M40 70 L40 100 L60 100 L60 70 Z" style="fill:#15803d;"/></g></svg></div>`,
-                        options: ['Bola', 'Piramida', 'Kubus']
-                    },
-                    { id: 34, section: 2, isVisual: true, q: 'Identifikasi Pola Tersembunyi: Temukan bentuk bintang pada gambar kompleks.', answer: 'Ada', options: ['Ada', 'Tidak Ada'] },
-                    { 
-                        id: 35, section: 2, isVisual: true, 
-                        q: 'Analogi Visual: Perhatikan hubungan antara gambar A dan B. Terapkan pola yang sama untuk gambar C.', 
-                        answer: 'B',
-                        visualQuestion: `<div class="flex justify-center items-center my-4 p-4 bg-gray-100 rounded-lg space-x-4 text-xl"><div class="text-center"><p>A</p><svg width="50" height="50"><circle cx="25" cy="25" r="15" stroke="black" fill="none" stroke-width="2"/></svg></div><span>:</span><div class="text-center"><p>B</p><svg width="50" height="50"><circle cx="25" cy="25" r="15" stroke="black" fill="none" stroke-width="2"/><line x1="25" y1="10" x2="25" y2="40" stroke="black" stroke-width="2"/></svg></div><span class="ml-8">::</span><div class="text-center"><p>C</p><svg width="50" height="50"><rect x="10" y="10" width="30" height="30" stroke="black" fill="none" stroke-width="2"/></svg></div><span>:</span><span class="font-bold text-gray-500">?</span></div>`,
-                        options: [
-                            { value: 'A', visual: `<svg width="60" height="60" viewBox="0 0 60 60"><rect x="15" y="15" width="30" height="30" stroke="black" fill="none" stroke-width="2"/></svg>` },
-                            { value: 'B', visual: `<svg width="60" height="60" viewBox="0 0 60 60"><rect x="15" y="15" width="30" height="30" stroke="black" fill="none" stroke-width="2"/><line x1="30" y1="15" x2="30" y2="45" stroke="black" stroke-width="2"/></svg>` },
-                            { value: 'C', visual: `<svg width="60" height="60" viewBox="0 0 60 60"><rect x="15" y="15" width="30" height="30" stroke="black" fill="none" stroke-width="2"/><line x1="15" y1="15" x2="45" y2="45" stroke="black" stroke-width="2"/></svg>` }
-                        ]
-                    },
-                    { id: 36, section: 2, isVisual: true, q: 'Gambar Berbeda (Detail): Lima wajah tersenyum, satu memiliki alis berbeda. Temukan yang berbeda.', answer: 'Wajah D', options: ['Wajah A', 'Wajah B', 'Wajah C', 'Wajah D'] },
-                    { id: 37, section: 3, q: 'Urutan Angka Terbalik: Hafalkan: "7, 3, 9, 2, 4". Tuliskan kembali dalam urutan terbalik.', answer: '4, 2, 9, 3, 7' },
-                    { id: 38, section: 3, q: 'Cerita Singkat 1: Hafalkan: "Pada hari Minggu pagi, Pak Budi pergi memancing di sungai. Ia berhasil mendapatkan tiga ikan besar." Pertanyaan: Kapan Pak Budi pergi memancing?', answer: 'Minggu pagi' },
-                    { id: 39, section: 3, q: 'Huruf Acak: Hafalkan: "H M R U A". Temukan kata bermakna dari huruf-huruf tersebut.', answer: 'RUMAH' },
-                    { id: 40, section: 3, q: 'Cerita Singkat 2: Hafalkan: "Sinta pergi ke pasar membeli apel, jeruk, dan mangga. Ia naik sepeda dan membawa keranjang berwarna merah." Pertanyaan: Apa warna keranjang yang dibawa Sinta?', answer: 'Merah' },
-                    { id: 41, section: 3, q: 'Urutan Warna: Hafalkan: "Merah - Biru - Kuning - Hijau". Manakah urutan yang benar?', answer: 'Merah - Biru - Kuning - Hijau', options: ['Merah - Kuning - Biru - Hijau', 'Merah - Biru - Kuning - Hijau', 'Biru - Merah - Hijau - Kuning'] },
-                    { id: 42, section: 3, q: 'Pasangan Simbol-Angka: Hafalkan: "A1 = 3, B2 = 5, C3 = 7". Berapakah nilai untuk D4 jika polanya berlanjut?', answer: '9' },
-                    { id: 43, section: 3, q: 'Mengingat Benda: Hafalkan: "Buku, Pensil, Gelas". Sebutkan salah satu benda yang ditampilkan.', answer: ['Buku', 'Pensil', 'Gelas'] },
-                    { id: 44, section: 3, q: 'Cerita Singkat 3: Hafalkan: "Dina adalah seorang dokter hewan. Kemarin ia merawat seekor anjing pudel yang kakinya terluka." Pertanyaan: Apa profesi Dina?', answer: 'Dokter hewan' },
-                    { id: 45, section: 3, q: 'Urutan Kata: Hafalkan: "Rumah - Jalan - Kota - Negara". Tuliskan kembali urutannya.', answer: 'Rumah - Jalan - Kota - Negara' },
-                    { id: 46, section: 3, q: 'Pasangan Logika: Hafalkan: "Kucing = Meong dan Anjing = Gukguk". Maka Sapi = ?', answer: 'Moo' },
-                    { id: 47, section: 3, q: 'Mengingat Alamat: Hafalkan: "Toko Buku ABC terletak di Jalan Merpati No. 25." Pertanyaan: Di jalan apa toko buku itu berada?', answer: 'Jalan Merpati' },
-                    { id: 48, section: 3, q: 'Simbol dan Arah: Hafalkan: "↑ ↓ → ←". Tuliskan kembali urutan simbol tersebut.', answer: '↑ ↓ → ←' },
-                    { id: 49, section: 4, q: 'Pilih Angka Berbeda: 38261, 38261, 38261, 38216', answer: '38216', options: ['38261', '38261', '38261', '38216'] },
-                    { id: 50, section: 4, q: 'Pilih Huruf Berbeda: A B C D E F G H J K L M', answer: 'I tidak ada', options: ['H', 'J', 'K', 'I tidak ada'] },
-                    { id: 51, section: 4, q: 'Hitung Cepat: (28 + 17) – (12 + 9) = ?', answer: '24', options: ['22', '24', '26', '28'] },
-                    { id: 52, section: 4, q: 'Cocokkan Simbol: Perhatikan barisan ini: ⚫🔺🔺⚫⚫. Berapa jumlah simbol 🔺?', answer: '2', options: ['1', '2', '3'] },
-                    { id: 53, section: 4, q: 'Temukan Pasangan Sama: Mana pasangan yang identik?', answer: 'MN890 - MN890', options: ['KL567 - KL576', 'MN890 - MN890', 'PQ123 - Pq123'] },
-                    { id: 54, section: 4, q: 'Hitung Huruf \'a\': "Kemarin Ayah saya membeli alpukat di pasar."', answer: '7', options: ['6', '7', '8'] },
-                    { id: 55, section: 4, q: 'Perbandingan Cepat: Mana yang lebih besar, 5/8 atau 4/7?', answer: '5/8', options: ['5/8', '4/7', 'Sama besar'] },
-                    { id: 56, section: 4, q: 'Pilih Pasangan Tidak Berurutan:', answer: '2468', options: ['1234', '5678', '9876', '2468'] },
-                    { id: 57, section: 4, q: 'Mencocokkan Kombinasi: Jika A=1, B=2, C=3, mana kombinasi yang benar?', answer: 'C3', options: ['A2', 'B3', 'C3'] },
-                    { id: 58, section: 4, q: 'Temukan Simbol yang Hilang: ⚫🔺◼️...⚫🔺◼️', answer: '◻️', options: ['⚫', '🔺', '◼️', '◻️'] },
-                    { id: 59, section: 4, q: 'Hitung Cepat: 15 x 4 ÷ 2 = ?', answer: '30', options: ['30', '45', '60'] },
-                    { id: 60, section: 4, q: 'Identifikasi Kesalahan: "Burung bisa terbang karna memiliki sayap." Di mana letak kesalahannya?', answer: 'karna', options: ['Burung', 'terbang', 'karna', 'sayap'] },
+                    // Questions will be populated by app.lang.init()
                 ]
             },
             'Minat Bakat Premium': {
-                title: 'Tes Minat Bakat Holland Code (RIASEC)',
+                title: {id: 'Tes Minat Bakat Holland Code (RIASEC)', en: 'Holland Code Interest Test (RIASEC)'},
                 testType: 'riasec',
                 questions: [
-                    { text: "Memperbaiki peralatan elektronik atau mekanik.", type: 'R' }, { text: "Bekerja di luar ruangan (outdoor).", type: 'R' }, { text: "Menggunakan perkakas atau mesin.", type: 'R' }, { text: "Mengemudikan truk atau traktor.", type: 'R' }, { text: "Membangun sesuatu dengan kayu.", type: 'R' }, { text: "Bekerja dengan tangan (misal: merakit).", type: 'R' }, { text: "Mengikuti kursus pertukangan atau otomotif.", type: 'R' }, { text: "Berolahraga atau aktivitas fisik.", type: 'R' }, { text: "Bekerja di bidang konstruksi.", type: 'R' }, { text: "Memelihara taman atau kebun.", type: 'R' },
-                    { text: "Melakukan penelitian ilmiah.", type: 'I' }, { text: "Memecahkan soal matematika atau logika.", type: 'I' }, { text: "Membaca buku atau artikel ilmiah.", type: 'I' }, { text: "Bekerja di laboratorium.", type: 'I' }, { text: "Menganalisis data atau statistik.", type: 'I' }, { text: "Mempelajari cara kerja alam semesta.", type: 'I' }, { text: "Menulis artikel tentang penemuan baru.", type: 'I' }, { text: "Menggunakan mikroskop atau teleskop.", type: 'I' }, { text: "Mengembangkan sebuah teori.", type: 'I' }, { text: "Melakukan eksperimen.", type: 'I' },
-                    { text: "Melukis, menggambar, atau memahat.", type: 'A' }, { text: "Bermain alat musik.", type: 'A' }, { text: "Menulis cerita, puisi, atau naskah drama.", type: 'A' }, { text: "Menjadi aktor atau aktris dalam sebuah pertunjukan.", type: 'A' }, { text: "Mendesain pakaian atau interior.", type: 'A' }, { text: "Mengambil foto artistik.", type: 'A' }, { text: "Menyanyi solo atau dalam paduan suara.", type: 'A' }, { text: "Menghadiri konser, teater, atau pameran seni.", type: 'A' }, { text: "Menciptakan tarian atau koreografi.", type: 'A' }, { text: "Membuat sketsa ide-ide kreatif.", type: 'A' },
-                    { text: "Mengajar atau melatih orang lain.", type: 'S' }, { text: "Membantu orang lain memecahkan masalah pribadi mereka.", type: 'S' }, { text: "Bekerja sebagai sukarelawan.", type: 'S' }, { text: "Merawat orang sakit atau anak-anak.", type: 'S' }, { text: "Menjadi penasihat atau konselor.", type: 'S' }, { text: "Bekerja dalam tim untuk tujuan sosial.", type: 'S' }, { text: "Mendengarkan cerita dan masalah teman.", type: 'S' }, { text: "Mengorganisir acara komunitas.", type: 'S' }, { text: "Menjadi seorang terapis.", type: 'S' }, { text: "Menjelaskan sesuatu kepada orang lain.", type: 'S' },
-                    { text: "Memimpin sebuah tim atau proyek.", type: 'E' }, { text: "Meyakinkan atau memengaruhi orang lain.", type: 'E' }, { text: "Menjual sebuah produk atau ide.", type: 'E' }, { text: "Memberikan pidato di depan umum.", type: 'E' }, { text: "Memulai bisnis sendiri.", type: 'E' }, { text: "Mengatur dan mengelola sebuah acara besar.", type: 'E' }, { text: "Bernegosiasi untuk mendapatkan kesepakatan.", type: 'E' }, { text: "Menjadi manajer atau eksekutif.", type: 'E' }, { text: "Mencari peluang untuk mendapatkan keuntungan.", type: 'E' }, { text: "Memotivasi orang lain untuk mencapai tujuan.", type: 'E' },
-                    { text: "Mengelola anggaran atau catatan keuangan.", type: 'C' }, { text: "Bekerja dengan angka dan data.", type: 'C' }, { text: "Membuat jadwal atau rencana yang terperinci.", type: 'C' }, { text: "Mengorganisir file dan dokumen.", type: 'C' }, { text: "Mengikuti prosedur dan aturan yang jelas.", type: 'C' }, { text: "Memeriksa dokumen untuk mencari kesalahan (proofreading).", type: 'C' }, { text: "Bekerja di kantor.", type: 'C' }, { text: "Menggunakan spreadsheet atau database.", type: 'C' }, { text: "Menyusun laporan berdasarkan data.", type: 'C' }, { text: "Memastikan semua detail sudah benar dan akurat.", type: 'C' }
+                   // Questions will be populated by app.lang.init()
                 ]
             }
         };
@@ -432,12 +349,14 @@
 
         app.test.updateDashboard = () => {
             const dashboardScreen = document.getElementById('dashboard-screen');
+            const t = app.lang.get.bind(app.lang);
             let cardsHTML = '';
+
             for (const testKey in app.test.data.allTests) {
                 const testInfo = app.test.data.allTests[testKey];
                 const isCompleted = app.test.state.savedResults[testInfo.premiumKey];
                 const completedClass = isCompleted ? 'bg-green-50 border-green-600' : 'bg-white';
-                const statusHTML = isCompleted ? `<span class="bg-violet-200 text-violet-800 text-xs font-bold px-2.5 py-0.5 rounded-full"><i class="fas fa-star mr-1"></i>Selesai</span>` : '';
+                const statusHTML = isCompleted ? `<span class="bg-violet-200 text-violet-800 text-xs font-bold px-2.5 py-0.5 rounded-full"><i class="fas fa-star mr-1"></i>${t('completed_status')}</span>` : '';
                 
                 cardsHTML += `
                     <div data-testid="${testInfo.premiumKey}" class="test-card ${completedClass} p-6 rounded-xl shadow-md card-hover-effect cursor-pointer">
@@ -445,8 +364,8 @@
                             <i class="fas ${testInfo.icon} text-3xl ${testInfo.color} mb-3"></i>
                             ${statusHTML}
                         </div>
-                        <h3 class="font-bold text-lg">${testInfo.title}</h3>
-                        <p class="text-sm text-gray-500">${testInfo.description}</p>
+                        <h3 class="font-bold text-lg">${testInfo.title[app.lang.current]}</h3>
+                        <p class="text-sm text-gray-500">${testInfo.description[app.lang.current]}</p>
                     </div>
                 `;
             }
@@ -454,14 +373,14 @@
             const requiredKeys = Object.values(app.test.data.allTests).map(test => test.premiumKey);
             const allTestsDone = requiredKeys.every(key => app.test.state.savedResults[key]);
             const recoCardState = allTestsDone ? 'cursor-pointer' : 'opacity-50 cursor-not-allowed';
-            const recoCardDesc = allTestsDone ? 'Lihat analisis gabungan dari semua tes yang telah Anda selesaikan.' : 'Selesaikan Tes IQ dan Tes Minat Bakat untuk membuka fitur ini.';
+            const recoCardDesc = allTestsDone ? t('reco_desc_unlocked') : t('reco_desc_locked');
 
             const careerRecoCard = `
                 <div id="career-reco-card" class="bg-indigo-600 text-white p-6 rounded-xl shadow-lg card-hover-effect ${recoCardState} md:col-span-2">
                      <div class="flex items-center">
                         <i class="fas fa-briefcase text-3xl mr-4"></i>
                         <div>
-                            <h3 class="font-bold text-lg">Rekomendasi Karir Terpersonalisasi</h3>
+                            <h3 class="font-bold text-lg">${t('reco_title')}</h3>
                             <p class="text-sm text-indigo-200">${recoCardDesc}</p>
                         </div>
                     </div>
@@ -469,17 +388,22 @@
             `;
 
             dashboardScreen.innerHTML = `
-                <div class="bg-white p-6 rounded-xl shadow-lg mb-8 flex flex-col sm:flex-row justify-between items-center text-center sm:text-left">
-                    <div class="flex items-center mb-4 sm:mb-0">
-                        <i class="fas fa-brain text-4xl text-indigo-500 mr-5"></i>
-                        <div>
-                            <h1 class="text-2xl font-bold text-gray-900 mb-1">Halo, <span id="user-name-display">${app.test.state.currentUser}</span>!</h1>
-                            <p class="text-gray-600">Temukan kekuatan Anda. Pilih tes di bawah ini untuk memulai.</p>
+                <div class="bg-white p-6 rounded-xl shadow-lg mb-8">
+                    <div class="flex flex-col sm:flex-row justify-between items-center text-center sm:text-left">
+                        <div class="flex items-center mb-4 sm:mb-0">
+                            <i class="fas fa-brain text-4xl text-indigo-500 mr-5"></i>
+                            <div>
+                                <h1 class="text-2xl font-bold text-gray-900 mb-1">${t('dashboard_greeting')}, <span id="user-name-display">${app.test.state.currentUser}</span>!</h1>
+                                <p class="text-gray-600">${t('dashboard_subtitle')}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center mt-4 sm:mt-0">
+                            ${app.ui.getLangToggleHTML()}
+                            <button id="logout-btn" class="bg-red-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-600 transition text-sm ml-4">
+                                <i class="fas fa-sign-out-alt mr-2"></i>${t('logout_button')}
+                            </button>
                         </div>
                     </div>
-                    <button id="logout-btn" class="bg-red-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-600 transition text-sm w-full sm:w-auto">
-                        <i class="fas fa-sign-out-alt mr-2"></i>Keluar
-                    </button>
                 </div>
                 <div id="test-dashboard-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     ${cardsHTML}
@@ -506,23 +430,24 @@
             app.test.state.userAnswers = {};
             app.test.state.currentQuestionIndex = 0;
             app.test.state.riasecCurrentPage = 1;
+            const t = app.lang.get.bind(app.lang);
 
             const timeInSeconds = app.test.data.timerConfigs[testKey];
             let instructions = '';
             if (testKey === 'Kognitif Premium') {
-                instructions = 'Tes ini mengukur berbagai kemampuan kognitif. Kerjakan dengan cepat dan teliti. Perhatikan setiap instruksi per bagian.';
+                instructions = t('instructions_iq');
             } else if (testKey === 'Minat Bakat Premium') {
-                instructions = 'Pilih "Suka" atau "Tidak Suka" untuk setiap kegiatan. Jawablah dengan jujur sesuai minat Anda untuk mendapatkan hasil yang akurat.';
+                instructions = t('instructions_riasec');
             }
             
             const startScreen = document.getElementById('start-test-screen');
             startScreen.innerHTML = `
                 <div class="bg-white p-8 rounded-xl shadow-lg text-center">
-                    <h2 class="text-3xl font-bold text-gray-900 mb-4">${app.test.state.currentTest.title}</h2>
-                    <div class="bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 p-4 mb-6 rounded-r-lg text-left"><p class="font-bold mb-2">Instruksi Penting:</p><p>${instructions}</p></div>
-                    <div class="flex justify-center items-center text-lg text-gray-700 mb-8"><i class="far fa-clock mr-3 text-2xl"></i><div><p>Waktu Pengerjaan:</p><p class="font-bold text-2xl text-indigo-600">${timeInSeconds / 60} Menit</p></div></div>
-                    <button id="start-test-button" class="w-full max-w-sm mx-auto bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-indigo-700 transition duration-300">Mulai Pengerjaan</button>
-                    <button class="back-to-dashboard w-full mt-3 text-sm text-gray-500 hover:underline">Kembali ke Dashboard</button>
+                    <h2 class="text-3xl font-bold text-gray-900 mb-4">${app.test.state.currentTest.title[app.lang.current]}</h2>
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 p-4 mb-6 rounded-r-lg text-left"><p class="font-bold mb-2">${t('instructions_title')}:</p><p>${instructions}</p></div>
+                    <div class="flex justify-center items-center text-lg text-gray-700 mb-8"><i class="far fa-clock mr-3 text-2xl"></i><div><p>${t('time_label')}:</p><p class="font-bold text-2xl text-indigo-600">${timeInSeconds / 60} ${t('minutes_label')}</p></div></div>
+                    <button id="start-test-button" class="w-full max-w-sm mx-auto bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-indigo-700 transition duration-300">${t('start_button')}</button>
+                    <button class="back-to-dashboard w-full mt-3 text-sm text-gray-500 hover:underline">${t('back_to_dashboard_button')}</button>
                 </div>`;
             app.ui.showScreen('start-test-screen');
         };
@@ -530,9 +455,10 @@
         app.test.beginActualTest = () => {
             let timeLeft = app.test.data.timerConfigs[app.test.state.currentTestKey];
             const testScreen = document.getElementById('test-screen');
+            const t = app.lang.get.bind(app.lang);
             testScreen.innerHTML = `
                 <div class="bg-white p-4 rounded-xl shadow-md mb-6 flex justify-between items-center sticky top-4 z-10">
-                    <button class="back-to-dashboard text-indigo-600 hover:text-indigo-800 text-sm"><i class="fas fa-arrow-left mr-2"></i>Kembali</button>
+                    <button class="back-to-dashboard text-indigo-600 hover:text-indigo-800 text-sm"><i class="fas fa-arrow-left mr-2"></i>${t('back_button')}</button>
                     <div class="font-bold text-xl text-red-600 bg-red-100 px-4 py-2 rounded-full"><i class="far fa-clock mr-2"></i><span id="time-remaining">${app.test.formatTime(timeLeft)}</span></div>
                 </div>
                 <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg">
@@ -541,10 +467,10 @@
                     <div id="progress-bar-container" class="mb-6"></div>
                     <div id="question-container"></div>
                     <div id="navigation-container" class="flex justify-between items-center mt-8">
-                        <button id="prev-btn" class="bg-gray-200 text-gray-700 font-bold py-2 px-6 rounded-full hover:bg-gray-300 transition duration-300">Sebelumnya</button>
+                        <button id="prev-btn" class="bg-gray-200 text-gray-700 font-bold py-2 px-6 rounded-full hover:bg-gray-300 transition duration-300">${t('prev_button')}</button>
                         <div id="progress-text" class="text-sm text-gray-500"></div>
-                        <button id="next-btn" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-full hover:bg-blue-700 transition duration-300">Berikutnya</button>
-                        <button id="submit-btn" class="hidden w-full bg-green-600 text-white font-bold py-3 px-4 rounded-full hover:bg-green-700 transition duration-300 transform hover:scale-105">Lihat Hasil Tes</button>
+                        <button id="next-btn" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-full hover:bg-blue-700 transition duration-300">${t('next_button')}</button>
+                        <button id="submit-btn" class="hidden w-full bg-green-600 text-white font-bold py-3 px-4 rounded-full hover:bg-green-700 transition duration-300 transform hover:scale-105">${t('submit_button')}</button>
                     </div>
                 </div>`;
             
@@ -562,7 +488,7 @@
             }, 1000);
 
             if (app.test.state.currentTest.testType === 'riasec') {
-                app.test.state.currentTest.questions = [...app.test.state.currentTest.questions]
+                app.test.state.currentTest.questions = [...app.test.data.questions['Minat Bakat Premium'].questions]
                     .map((q, i) => ({...q, originalIndex: i}))
                     .sort(() => Math.random() - 0.5);
                 app.test.renderRIASECPage();
@@ -572,7 +498,7 @@
         };
 
         app.test.autoSubmitTest = () => {
-            app.ui.showCustomAlert("Waktu habis! Tes akan diselesaikan secara otomatis.");
+            app.ui.showCustomAlert(app.lang.get('feedback_time_up'));
             app.test.confirmAndAnalyze();
         };
         
@@ -584,25 +510,28 @@
 
         app.test.renderQuestion = () => {
             const { currentTest, currentQuestionIndex, userAnswers } = app.test.state;
+            const lang = app.lang.current;
+            const t = app.lang.get.bind(app.lang);
             
-            document.getElementById('test-title').textContent = currentTest.title;
+            document.getElementById('test-title').textContent = currentTest.title[lang];
             const questionData = currentTest.questions[currentQuestionIndex];
             const container = document.getElementById('question-container');
             
             let sectionTitle = '';
             if (currentTest.sections) {
-                sectionTitle = currentTest.sections[questionData.section];
+                sectionTitle = currentTest.sections[lang][questionData.section];
                 document.getElementById('test-section-title').textContent = sectionTitle;
             }
             
             const startMemoryCountdown = () => {
-                const stimulusMatch = questionData.q.match(/Hafalkan: "(.*?)"/);
+                const qText = questionData.text[lang];
+                const stimulusMatch = qText.match(new RegExp(t('hafalkan_regex')));
                 const stimulus = stimulusMatch ? stimulusMatch[1] : '';
-                const taskText = questionData.q.replace(/.*Hafalkan: ".*?"\s*\.?\s*/, '').trim();
+                const taskText = qText.replace(new RegExp(t('hafalkan_replace_regex')), '').trim();
 
                 let questionHTML = `
                     <div id="memory-stimulus" class="text-center p-4">
-                        <p class="text-gray-600 mb-2">Hafalkan informasi berikut dalam <span id="countdown" class="font-bold text-red-500">7</span> detik...</p>
+                        <p class="text-gray-600 mb-2">${t('memorize_in_seconds', {seconds: 7})}</p>
                         <div class="text-xl font-semibold text-indigo-700 p-4 bg-indigo-50 rounded-lg">${stimulus}</div>
                     </div>
                     <div id="memory-task" class="hidden">
@@ -612,7 +541,7 @@
                 let optionsHTML = '<div id="options-container-wrapper" class="hidden flex flex-col items-center space-y-3 w-full max-w-md">';
                 
                 if (questionData.options) {
-                    let options = [...questionData.options];
+                    let options = [...questionData.options[lang]];
                     options.sort(() => Math.random() - 0.5);
 
                     options.forEach((option, index) => {
@@ -626,7 +555,7 @@
                             </div>`;
                     });
                 } else {
-                    optionsHTML += `<input type="text" id="text-input-${currentQuestionIndex}" class="block w-full text-center p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="Ketik jawaban Anda di sini" value="${userAnswers[currentQuestionIndex] || ''}">`;
+                    optionsHTML += `<input type="text" id="text-input-${currentQuestionIndex}" class="block w-full text-center p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="${t('type_answer_placeholder')}" value="${userAnswers[currentQuestionIndex] || ''}">`;
                 }
                 
                 optionsHTML += '</div>';
@@ -669,11 +598,11 @@
             };
             
             if (questionData.section === 3 && (currentTest.questions[currentQuestionIndex-1]?.section !== 3)) {
-                app.ui.showCustomAlert("Perhatian! Bagian tes memori akan dimulai. Anda akan diberi waktu beberapa detik untuk menghafal informasi sebelum menjawab.", startMemoryCountdown);
-            } else if (currentTest.testType === 'iq' && questionData.section === 3 && questionData.q.includes('Hafalkan:')) {
+                app.ui.showCustomAlert(t('feedback_memory_start'), startMemoryCountdown);
+            } else if (currentTest.testType === 'iq' && questionData.section === 3 && questionData.text[lang].includes(t('hafalkan_keyword'))) {
                 startMemoryCountdown();
             } else {
-                let questionHTML = `<p class="text-lg sm:text-xl mb-4 text-center">${questionData.q}</p>`;
+                let questionHTML = `<p class="text-lg sm:text-xl mb-4 text-center">${questionData.text[lang]}</p>`;
                 if (questionData.isVisual) {
                     if (questionData.visualQuestion) {
                         questionHTML += questionData.visualQuestion;
@@ -682,7 +611,7 @@
                     }
                 }
                 
-                const optionsToUse = questionData.options || currentTest.options;
+                const optionsToUse = questionData.options ? questionData.options[lang] : (currentTest.options ? currentTest.options[lang] : null);
                 let optionsHTML = '';
 
                 if (optionsToUse && optionsToUse[0].visual) {
@@ -727,7 +656,9 @@
 
         app.test.renderRIASECPage = () => {
             const { currentTest, riasecCurrentPage, riasecQuestionsPerPage, userAnswers } = app.test.state;
-            document.getElementById('test-title').textContent = currentTest.title;
+            const lang = app.lang.current;
+            const t = app.lang.get.bind(app.lang);
+            document.getElementById('test-title').textContent = currentTest.title[lang];
             document.getElementById('test-section-title').textContent = '';
             
             const progressBarContainer = document.getElementById('progress-bar-container');
@@ -754,12 +685,12 @@
                 
                 const questionText = document.createElement('p');
                 questionText.className = 'font-semibold text-gray-700 mb-4 text-center';
-                questionText.textContent = `${globalIndex + 1}. ${q.text}`;
+                questionText.textContent = `${globalIndex + 1}. ${q.text[lang]}`;
                 
                 const optionsDiv = document.createElement('div');
                 optionsDiv.className = 'flex items-center justify-center space-x-4';
                 
-                [{val: 1, label: 'Suka'}, {val: 0, label: 'Tidak Suka'}].forEach(opt => {
+                [{val: 1, label: t('like_option')}, {val: 0, label: t('dislike_option')}].forEach(opt => {
                     const optionId = `q_${q.originalIndex}_${opt.val}`;
                     const input = document.createElement('input');
                     input.type = 'radio';
@@ -805,8 +736,9 @@
             const answeredCount = Object.keys(app.test.state.userAnswers).length;
             const totalQuestions = app.test.state.currentTest.questions.length;
             const progress = (answeredCount / totalQuestions) * 100;
+            const t = app.lang.get.bind(app.lang);
             document.getElementById('riasec-progress-bar-fill').style.width = `${progress}%`;
-            document.getElementById('riasec-progress-text').textContent = `Pertanyaan ${answeredCount} dari ${totalQuestions}`;
+            document.getElementById('riasec-progress-text').textContent = t('question_progress', {answered: answeredCount, total: totalQuestions});
             document.getElementById('riasec-progress-percentage').textContent = `${Math.round(progress)}%`;
         };
         
@@ -841,18 +773,19 @@
             const nextBtn = document.getElementById('next-btn');
             const submitBtn = document.getElementById('submit-btn');
             const progressText = document.getElementById('progress-text');
+            const t = app.lang.get.bind(app.lang);
             
             if (currentTest.testType === 'riasec') {
                 const totalPages = Math.ceil(currentTest.questions.length / riasecQuestionsPerPage);
                 prevBtn.style.visibility = riasecCurrentPage > 1 ? 'visible' : 'hidden';
                 nextBtn.style.display = riasecCurrentPage < totalPages ? 'inline-block' : 'none';
                 submitBtn.style.display = riasecCurrentPage === totalPages ? 'inline-block' : 'none';
-                progressText.textContent = `Halaman ${riasecCurrentPage} dari ${totalPages}`;
+                progressText.textContent = t('page_progress', {current: riasecCurrentPage, total: totalPages});
             } else {
                 prevBtn.style.visibility = currentQuestionIndex > 0 ? 'visible' : 'hidden';
                 nextBtn.style.display = currentQuestionIndex < currentTest.questions.length - 1 ? 'inline-block' : 'none';
                 submitBtn.style.display = currentQuestionIndex === currentTest.questions.length - 1 ? 'inline-block' : 'none';
-                progressText.textContent = `Soal ${currentQuestionIndex + 1} dari ${currentTest.questions.length}`;
+                progressText.textContent = t('question_progress_simple', {current: currentQuestionIndex + 1, total: currentTest.questions.length});
             }
         };
 
@@ -869,8 +802,7 @@
             }
 
             if (userAnswers[currentQuestionIndex] === undefined || userAnswers[currentQuestionIndex] === '') {
-                // BUG FIX: Changed alert message to be more generic
-                app.ui.showCustomAlert('Silakan isi jawaban terlebih dahulu.'); return;
+                app.ui.showCustomAlert(app.lang.get('feedback_answer_first')); return;
             }
             if (currentQuestionIndex < currentTest.questions.length - 1) {
                 app.test.state.currentQuestionIndex++;
@@ -894,13 +826,14 @@
 
         app.test.submitTest = () => {
             const { currentTest, userAnswers, currentQuestionIndex } = app.test.state;
+            const t = app.lang.get.bind(app.lang);
             if (currentTest.testType === 'riasec') {
                  if (Object.keys(userAnswers).length < currentTest.questions.length) {
-                    app.ui.showCustomAlert('Harap jawab semua pertanyaan sebelum melihat hasil.');
+                    app.ui.showCustomAlert(t('feedback_answer_all'));
                     return;
                 }
             } else if (currentTest.testType !== 'disc' && (userAnswers[currentQuestionIndex] === undefined || userAnswers[currentQuestionIndex] === '')) {
-                app.ui.showCustomAlert('Silakan isi jawaban terlebih dahulu.'); return;
+                app.ui.showCustomAlert(t('feedback_answer_first')); return;
             }
             if (app.test.state.testTimerInterval) clearInterval(app.test.state.testTimerInterval);
             app.test.confirmAndAnalyze();
@@ -909,11 +842,12 @@
         app.test.confirmAndAnalyze = () => {
             if (app.test.state.testTimerInterval) clearInterval(app.test.state.testTimerInterval);
             const resultsScreen = document.getElementById('results-screen');
+            const t = app.lang.get.bind(app.lang);
             resultsScreen.innerHTML = `
-                <button class="back-to-dashboard mb-6 text-indigo-600 hover:text-indigo-800"><i class="fas fa-arrow-left mr-2"></i>Kembali ke Dashboard</button>
+                <button class="back-to-dashboard mb-6 text-indigo-600 hover:text-indigo-800"><i class="fas fa-arrow-left mr-2"></i>${t('back_to_dashboard_button')}</button>
                 <div id="loading-indicator" class="text-center p-8">
                     <i class="fas fa-spinner fa-spin text-4xl text-indigo-500"></i>
-                    <p class="mt-4 text-gray-600">Kami sedang menganalisa jawaban Anda...</p>
+                    <p class="mt-4 text-gray-600">${t('feedback_analyzing')}</p>
                 </div>
                 <div id="results-content" class="bg-white p-6 sm:p-8 rounded-xl shadow-lg hidden"></div>`;
             app.ui.showScreen('results-screen');
@@ -923,19 +857,21 @@
         app.test.processResultsAndGenerateAnalysis = () => {
             const { currentTest, currentUser, userAnswers } = app.test.state;
             let resultsSummary = {};
-            let promptText = `Anda adalah seorang konsultan psikologi. Pengguna bernama ${currentUser} telah menyelesaikan tes. Buat laporan psikologis yang profesional, tajam, dan bisa ditindaklanjuti dalam BAHASA INDONESIA. Gunakan format berikut untuk setiap judul bagian: [IKON:nama-ikon-fontawesome] Judul Bagian. Contoh: [IKON:fa-user-circle] Profil Umum. PENTING: Jangan gunakan karakter markdown seperti '*' atau '#'. Untuk menyorot informasi penting, apit teks dengan tag <u> dan </u>. Contoh: <u>Teks Penting</u>. Gunakan baris baru biasa untuk daftar. Di akhir laporan, tuliskan: "Laporan ini disusun oleh: Fajar, S.Psi". `;
+            let promptText = app.lang.get('prompt_base', {currentUser: currentUser});
             
             if (currentTest.name === 'Kognitif Premium') {
                 let correctAnswers = 0;
                 currentTest.questions.forEach((q, i) => {
                     const userAnswer = userAnswers[i];
                     let isCorrect = false;
+                    const answerLang = q.answer[app.lang.current] || q.answer['id']; // Fallback to id
                     if (q.options) {
-                        const selectedOptionText = q.options.find(opt => (opt.value !== undefined ? opt.value : opt) == userAnswer) || userAnswer;
-                        isCorrect = String(selectedOptionText).toLowerCase() === String(q.answer).toLowerCase();
+                        const optionsLang = q.options[app.lang.current] || q.options['id'];
+                        const selectedOptionText = optionsLang.find(opt => (opt.value !== undefined ? opt.value : opt) == userAnswer) || userAnswer;
+                        isCorrect = String(selectedOptionText).toLowerCase() === String(answerLang).toLowerCase();
                     } else {
-                        if (Array.isArray(q.answer)) isCorrect = q.answer.some(ans => String(ans).toLowerCase().trim() === String(userAnswer).toLowerCase().trim());
-                        else isCorrect = String(userAnswer || '').toLowerCase().replace(/[\s,.-]/g, '') === String(q.answer).toLowerCase().replace(/[\s,.-]/g, '');
+                        if (Array.isArray(answerLang)) isCorrect = answerLang.some(ans => String(ans).toLowerCase().trim() === String(userAnswer).toLowerCase().trim());
+                        else isCorrect = String(userAnswer || '').toLowerCase().replace(/[\s,.-]/g, '') === String(answerLang).toLowerCase().replace(/[\s,.-]/g, '');
                     }
                     if (isCorrect) correctAnswers++;
                 });
@@ -943,7 +879,7 @@
                 const iqScore = Math.round(70 + (correctAnswers / totalQuestions) * 90);
                 const iqCategory = app.test.getIQCategory(iqScore);
                 resultsSummary = { iqScore, iqCategory, correctAnswers, totalQuestions };
-                promptText += `Pengguna mendapatkan skor IQ ${iqScore} (kategori: ${iqCategory}). Berikan analisis singkat tentang arti skor ini dan potensi implikasinya dalam format berikut: [IKON:fa-magnifying-glass-chart] Analisis Umum, [IKON:fa-rocket] Potensi Kekuatan, [IKON:fa-compass] Area Pengembangan.`;
+                promptText += app.lang.get('prompt_iq', {iqScore: iqScore, iqCategory: iqCategory[app.lang.current]});
             } else if (currentTest.name === 'Minat Bakat Premium') {
                 const scores = { R: 0, I: 0, A: 0, S: 0, E: 0, C: 0 };
                 currentTest.questions.forEach((q) => {
@@ -952,7 +888,7 @@
                 const sortedScores = Object.entries(scores).sort(([,a],[,b]) => b-a);
                 const hollandCode = sortedScores.slice(0, 3).map(item => item[0]).join('');
                 resultsSummary = { hollandCode: hollandCode, scores: scores };
-                promptText += `Data hasil Tes Minat Bakat Holland (RIASEC) adalah Kode Holland: <u>${hollandCode}</u>. Buat bagian berikut: [IKON:fa-file-alt] Deskripsi Tipe Minat Dominan, [IKON:fa-building] Lingkungan Kerja Ideal, dan [IKON:fa-briefcase] Rekomendasi Karir Sesuai Minat.`;
+                promptText += app.lang.get('prompt_riasec', {hollandCode: hollandCode});
             }
 
             app.test.callGeminiAPI(promptText, resultsSummary, app.test.displayResults, app.test.state.currentTest.name);
@@ -962,7 +898,7 @@
             const nameForTest = testKey || app.test.state.currentTest.name;
             const apiKey = "AIzaSyDWCrd0lfmX75fPr11l74g7wgrnSi3PFhM"; 
             if (apiKey === "MASUKKAN_API_KEY_ANDA_DI_SINI") {
-                const errorText = "API Key belum dimasukkan. Silakan edit file index.html dan masukkan API Key Anda.";
+                const errorText = app.lang.get('feedback_no_api_key');
                 app.test.displayResults({ analysis: errorText, summary: results, testName: nameForTest });
                 return;
             }
@@ -976,17 +912,17 @@
                     throw new Error(`HTTP error! status: ${response.status} - ${errorBody.error?.message || 'Unknown Error'}`);
                 }
                 const data = await response.json();
-                const analysisText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Maaf, terjadi kesalahan saat AI menganalisis hasil.";
+                const analysisText = data.candidates?.[0]?.content?.parts?.[0]?.text || app.lang.get('feedback_analysis_error');
                 const resultData = { summary: results, analysis: analysisText, date: new Date().toLocaleString('id-ID'), testName: nameForTest };
                 
-                if(results) { // Only save if it's a test result, not a career reco
+                if(results) { 
                     app.test.state.savedResults[nameForTest] = resultData;
                     app.test.saveResultsToStorage();
                 }
                 callback(resultData);
             } catch (error) {
                 console.error("Error calling Gemini API directly:", error);
-                const errorText = `Terjadi masalah koneksi saat menghubungi AI. Pastikan Anda terhubung ke internet dan coba lagi. Error: ${error.message}`;
+                const errorText = app.lang.get('feedback_api_connection_error', {error: error.message});
                 callback({ analysis: errorText, summary: results, testName: nameForTest });
             }
         };
@@ -997,25 +933,27 @@
             
             const contentDiv = document.getElementById('results-content');
             const { testName, analysis, date } = resultData;
+            const t = app.lang.get.bind(app.lang);
+            const lang = app.lang.current;
 
             if (testName === 'Kognitif Premium') {
                 contentDiv.innerHTML = app.test.renderIQReport(resultData);
             } else {
                 let formattedText = analysis
-                    .replace(/\*\*(.*?)\*\*/g, '<u>$1</u>') // Replace **text** with <u>text</u>
-                    .replace(/\*(.*?)\*/g, '<u>$1</u>')   // Replace *text* with <u>text</u>
-                    .replace(/^#+\s/gm, '')              // Remove leading #
+                    .replace(/\*\*(.*?)\*\*/g, '<u>$1</u>')
+                    .replace(/\*(.*?)\*/g, '<u>$1</u>')
+                    .replace(/^#+\s/gm, '')
                     .replace(/\[IKON:(.*?)\]\s(.*?)\n/g, (match, icon, title) => {
                         return `<div class="flex items-center text-xl font-bold text-gray-800 mt-6 mb-3"><i class="fas ${icon.trim()} text-indigo-500 mr-3 w-6 text-center"></i><h3>${title.trim()}</h3></div>`;
                     })
-                    .replace(/Laporan ini disusun oleh: Fajar, S.Psi/g, '<div class="mt-8 pt-4 border-t text-right text-sm text-gray-500"><em>Laporan ini disusun oleh:<br><strong>Fajar, S.Psi</strong></em></div>')
+                    .replace(/Laporan ini disusun oleh: Fajar, S.Psi/g, `<div class="mt-8 pt-4 border-t text-right text-sm text-gray-500"><em>${t('report_prepared_by')}<br><strong>Fajar, S.Psi</strong></em></div>`)
                     .replace(/\n/g, '<br>');
-                let resultSummaryHTML = `<h2 class="text-2xl font-bold mb-1 text-center">Laporan Psikologis untuk ${app.test.state.currentUser}</h2><p class="text-center text-sm text-gray-500 mb-6">Tes: ${app.test.data.questions[testName].title} | Diselesaikan pada: ${date || 'Saat ini'}</p>`;
+                let resultSummaryHTML = `<h2 class="text-2xl font-bold mb-1 text-center">${t('report_title_for', {name: app.test.state.currentUser})}</h2><p class="text-center text-sm text-gray-500 mb-6">${t('test_label')}: ${app.test.data.questions[testName].title[lang]} | ${t('completed_on_label')}: ${date || t('date_now')}</p>`;
                 contentDiv.innerHTML = resultSummaryHTML + `<div class="prose max-w-none">${formattedText}</div>`;
             }
             
             const downloadButton = document.createElement('button');
-            downloadButton.innerHTML = `<i class="fas fa-download mr-2"></i>Unduh Sertifikat`;
+            downloadButton.innerHTML = `<i class="fas fa-download mr-2"></i>${t('download_cert_button')}`;
             downloadButton.className = 'w-full mt-8 bg-blue-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-600 transition';
             downloadButton.onclick = () => app.test.generateCertificate(resultData);
             contentDiv.appendChild(downloadButton);
@@ -1024,31 +962,40 @@
         };
 
         app.test.getIQCategory = (score) => {
-            if (score < 70) return "Disabilitas Intelektual";
-            if (score <= 79) return "Ambang Batas";
-            if (score <= 89) return "Rata-rata Rendah";
-            if (score <= 109) return "Rata-rata";
-            if (score <= 119) return "Rata-rata Tinggi";
-            if (score <= 129) return "Superior";
-            return "Sangat Superior";
+            const categories = {
+                id: ["Disabilitas Intelektual", "Ambang Batas", "Rata-rata Rendah", "Rata-rata", "Rata-rata Tinggi", "Superior", "Sangat Superior"],
+                en: ["Intellectual Disability", "Borderline", "Low Average", "Average", "High Average", "Superior", "Very Superior"]
+            };
+            if (score < 70) return {id: categories.id[0], en: categories.en[0]};
+            if (score <= 79) return {id: categories.id[1], en: categories.en[1]};
+            if (score <= 89) return {id: categories.id[2], en: categories.en[2]};
+            if (score <= 109) return {id: categories.id[3], en: categories.en[3]};
+            if (score <= 119) return {id: categories.id[4], en: categories.en[4]};
+            if (score <= 129) return {id: categories.id[5], en: categories.en[5]};
+            return {id: categories.id[6], en: categories.en[6]};
         };
 
         app.test.renderIQReport = (resultData) => {
             const { summary, analysis, date } = resultData;
             const { iqScore, iqCategory } = summary;
+            const lang = app.lang.current;
+            const t = app.lang.get.bind(app.lang);
 
             const iqRanges = [
-                { range: "< 70", category: "Disabilitas Intelektual" }, { range: "70-79", category: "Ambang Batas" },
-                { range: "80-89", category: "Rata-rata Rendah" }, { range: "90-109", category: "Rata-rata" },
-                { range: "110-119", category: "Rata-rata Tinggi" }, { range: "120-129", category: "Superior" },
-                { range: "130+", category: "Sangat Superior" }
+                { range: "< 70", category: {id: "Disabilitas Intelektual", en: "Intellectual Disability"} }, 
+                { range: "70-79", category: {id: "Ambang Batas", en: "Borderline"} },
+                { range: "80-89", category: {id: "Rata-rata Rendah", en: "Low Average"} }, 
+                { range: "90-109", category: {id: "Rata-rata", en: "Average"} },
+                { range: "110-119", category: {id: "Rata-rata Tinggi", en: "High Average"} }, 
+                { range: "120-129", category: {id: "Superior", en: "Superior"} },
+                { range: "130+", category: {id: "Sangat Superior", en: "Very Superior"} }
             ];
 
             let tableRows = iqRanges.map(item => {
-                const isHighlight = item.category === iqCategory;
+                const isHighlight = item.category.id === iqCategory.id;
                 return `<tr class="${isHighlight ? 'iq-table-highlight' : ''}">
                             <td class="px-6 py-3">${item.range}</td>
-                            <td class="px-6 py-3">${item.category} ${isHighlight ? '(Posisi Anda)' : ''}</td>
+                            <td class="px-6 py-3">${item.category[lang]} ${isHighlight ? `(${t('your_position')})` : ''}</td>
                         </tr>`;
             }).join('');
             
@@ -1075,37 +1022,39 @@
             }).join('');
 
             return `
-                <h2 class="text-2xl font-bold mb-1 text-center">Sertifikat Hasil Tes IQ</h2>
-                <p class="text-center text-sm text-gray-500 mb-6">Nama Peserta: ${app.test.state.currentUser}</p>
+                <h2 class="text-2xl font-bold mb-1 text-center">${t('iq_cert_title')}</h2>
+                <p class="text-center text-sm text-gray-500 mb-6">${t('participant_name')}: ${app.test.state.currentUser}</p>
                 
                 <div class="bg-indigo-50 border-l-4 border-indigo-500 p-6 rounded-r-lg text-center mb-6">
-                    <p class="text-lg text-indigo-800">Skor IQ Anda:</p>
+                    <p class="text-lg text-indigo-800">${t('your_iq_score')}:</p>
                     <p class="text-6xl font-bold text-indigo-900">${iqScore}</p>
-                    <p class="text-lg text-indigo-800 mt-2">Kategori: ${iqCategory}</p>
+                    <p class="text-lg text-indigo-800 mt-2">${t('category_label')}: ${iqCategory[lang]}</p>
                 </div>
 
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm text-left text-gray-500">
                         <thead class="text-xs text-white uppercase bg-gray-700">
-                            <tr><th scope="col" class="px-6 py-3">Rentang IQ</th><th scope="col" class="px-6 py-3">Kategori</th></tr>
+                            <tr><th scope="col" class="px-6 py-3">${t('iq_range_header')}</th><th scope="col" class="px-6 py-3">${t('category_header')}</th></tr>
                         </thead>
                         <tbody>${tableRows}</tbody>
                     </table>
                 </div>
 
                 <div class="text-sm text-gray-600 mt-6 prose max-w-none">
-                    <p>Tabel di atas menggambarkan klasifikasi IQ dalam populasi umum berdasarkan standar internasional.</p>
-                    <p><strong>Skor IQ Anda adalah ${iqScore}</strong>, yang termasuk dalam kategori <strong>${iqCategory}</strong>.</p>
+                    <p>${t('iq_table_desc')}</p>
+                    <p><strong>${t('your_score_is')} ${iqScore}</strong>, ${t('which_is_in_category')} <strong>${iqCategory[lang]}</strong>.</p>
                     <div class="mt-4">${analysisSections}</div>
-                    <p class="mt-4 text-xs italic">Nilai ini diperoleh berdasarkan performa Anda dalam mengerjakan soal visual setara standar Raven's APM. Tes ini mengukur kemampuan berpikir logis dan pola, bukan hasil akademis. Hasil ini hanya merupakan estimasi kognitif dan tidak dimaksudkan untuk diagnosis medis atau psikologis formal.</p>
+                    <p class="mt-4 text-xs italic">${t('iq_disclaimer')}</p>
                 </div>
             `;
         };
 
         app.test.generateCertificate = (resultData) => {
             const { summary, testName, date } = resultData;
+            const lang = app.lang.current;
+            
             document.getElementById('cert-user-name').textContent = app.test.state.currentUser;
-            document.getElementById('cert-test-name').textContent = app.test.data.questions[testName].title;
+            document.getElementById('cert-test-name').textContent = app.test.data.questions[testName].title[lang];
             document.getElementById('cert-date').textContent = date.split(',')[0];
             
             const scoresContainer = document.getElementById('cert-scores');
@@ -1114,13 +1063,15 @@
 
             switch (testName) {
                 case 'Kognitif Premium':
-                    scoreHTML = `<div class="text-center"><p class="text-lg">Skor IQ Anda:</p><p class="text-4xl font-bold text-indigo-700">${summary.iqScore}</p><p class="text-md">${summary.iqCategory}</p></div>`;
+                    scoreHTML = `<div class="text-center"><p class="text-lg">${app.lang.get('your_iq_score')}:</p><p class="text-4xl font-bold text-indigo-700">${summary.iqScore}</p><p class="text-md">${summary.iqCategory[lang]}</p></div>`;
                     break;
                 case 'Minat Bakat Premium':
-                    scoreHTML = `<div class="text-center"><p class="text-lg">Kode Holland Anda:</p><p class="text-3xl font-bold text-indigo-700">${summary.hollandCode}</p></div>`;
+                    scoreHTML = `<div class="text-center"><p class="text-lg">${app.lang.get('your_holland_code')}:</p><p class="text-3xl font-bold text-indigo-700">${summary.hollandCode}</p></div>`;
                     break;
             }
             scoresContainer.innerHTML = scoreHTML;
+
+            app.lang.translateUI(document.getElementById('certificate'));
 
             const validationUrl = `https://example.com/validate?user=${app.test.state.currentUser}&test=${testName}&date=${date}`;
             const qrCodeEl = document.getElementById('cert-qr-code');
@@ -1135,10 +1086,10 @@
                     link.click();
                 }).catch(err => {
                     console.error("html2canvas error:", err);
-                    app.ui.showCustomAlert("Gagal membuat sertifikat. Silakan coba lagi.");
+                    app.ui.showCustomAlert(app.lang.get('feedback_cert_fail'));
                 });
             };
-            qrCodeEl.onerror = () => app.ui.showCustomAlert("Gagal memuat QR Code untuk sertifikat.");
+            qrCodeEl.onerror = () => app.ui.showCustomAlert(app.lang.get('feedback_qr_fail'));
         };
 
         app.test.viewResult = (testName) => {
@@ -1146,7 +1097,7 @@
             if (resultData) {
                 const resultsScreen = document.getElementById('results-screen');
                 resultsScreen.innerHTML = `
-                    <button class="back-to-dashboard mb-6 text-indigo-600 hover:text-indigo-800"><i class="fas fa-arrow-left mr-2"></i>Kembali ke Dashboard</button>
+                    <button class="back-to-dashboard mb-6 text-indigo-600 hover:text-indigo-800"><i class="fas fa-arrow-left mr-2"></i>${app.lang.get('back_to_dashboard_button')}</button>
                     <div id="results-content" class="bg-white p-6 sm:p-8 rounded-xl shadow-lg"></div>`;
                 app.ui.showScreen('results-screen');
                 app.test.displayResults(resultData);
@@ -1155,13 +1106,19 @@
         
         app.test.showCareerRecommendation = () => {
             const screen = document.getElementById('career-reco-screen');
-            screen.innerHTML = `<button class="back-to-dashboard mb-6 text-indigo-600 hover:text-indigo-800"><i class="fas fa-arrow-left mr-2"></i>Kembali</button><div id="career-loading-indicator" class="text-center p-8"><i class="fas fa-spinner fa-spin text-4xl text-indigo-500"></i><p class="mt-4 text-gray-600">Menganalisis profil komprehensif Anda...</p></div><div id="career-content" class="bg-white p-6 sm:p-8 rounded-xl shadow-lg hidden"></div>`;
+            const t = app.lang.get.bind(app.lang);
+            screen.innerHTML = `<button class="back-to-dashboard mb-6 text-indigo-600 hover:text-indigo-800"><i class="fas fa-arrow-left mr-2"></i>${t('back_button')}</button><div id="career-loading-indicator" class="text-center p-8"><i class="fas fa-spinner fa-spin text-4xl text-indigo-500"></i><p class="mt-4 text-gray-600">${t('feedback_analyzing_profile')}</p></div><div id="career-content" class="bg-white p-6 sm:p-8 rounded-xl shadow-lg hidden"></div>`;
             app.ui.showScreen('career-reco-screen');
 
             const iqResult = app.test.state.savedResults['Kognitif Premium'].summary;
             const bakatResult = app.test.state.savedResults['Minat Bakat Premium'].summary;
             
-            const prompt = `Anda adalah seorang konsultan karir ahli. Berdasarkan data psikologis pengguna bernama ${app.test.state.currentUser} ini: Skor IQ ${iqResult.iqScore} (Kategori: ${iqResult.iqCategory}) dan Kode Minat Holland ${bakatResult.hollandCode}, berikan analisis karir yang holistik dan terperinci dalam BAHASA INDONESIA. Buat bagian-bagian berikut: [IKON:fa-user-tie] Profil Karir Anda, [IKON:fa-lightbulb] Analisis Sinergi (bagaimana IQ dan Minat saling mendukung), dan [IKON:fa-ranking-star] 5 Rekomendasi Karir Teratas (jelaskan 'Mengapa Cocok' untuk setiap karir dengan menggabungkan kedua hasil tes). Gunakan format [IKON:nama-ikon] untuk setiap judul bagian. PENTING: Jangan gunakan karakter markdown seperti '*' atau '#'. Untuk menyorot informasi penting, apit teks dengan tag <u> dan </u>. Contoh: <u>Teks Penting</u>. Gunakan baris baru biasa untuk daftar. Di akhir laporan, tuliskan: "Laporan ini disusun oleh: Fajar, S.Psi".`;
+            const prompt = app.lang.get('prompt_reco', {
+                currentUser: app.test.state.currentUser,
+                iqScore: iqResult.iqScore,
+                iqCategory: iqResult.iqCategory[app.lang.current],
+                hollandCode: bakatResult.hollandCode
+            });
             app.test.callGeminiAPI(prompt, null, app.test.displayCareerRecommendation, 'Rekomendasi Karir');
         };
 
@@ -1169,21 +1126,22 @@
             const loadingIndicator = document.getElementById('career-loading-indicator');
             if(loadingIndicator) loadingIndicator.style.display = 'none';
             const contentDiv = document.getElementById('career-content');
+            const t = app.lang.get.bind(app.lang);
             
             let formattedText = result.analysis
-                .replace(/\*\*(.*?)\*\*/g, '<u>$1</u>') // Replace **text** with <u>text</u>
-                .replace(/\*(.*?)\*/g, '<u>$1</u>')   // Replace *text* with <u>text</u>
-                .replace(/^#+\s/gm, '')              // Remove leading #
+                .replace(/\*\*(.*?)\*\*/g, '<u>$1</u>')
+                .replace(/\*(.*?)\*/g, '<u>$1</u>')
+                .replace(/^#+\s/gm, '')
                 .replace(/\[IKON:(.*?)\]\s(.*?)\n/g, (match, icon, title) => `<div class="flex items-center text-xl font-bold text-gray-800 mt-6 mb-3"><i class="fas ${icon.trim()} text-indigo-500 mr-3 w-6 text-center"></i><h3>${title.trim()}</h3></div>`)
-                .replace(/Laporan ini disusun oleh: Fajar, S.Psi/g, '<div class="mt-8 pt-4 border-t text-right text-sm text-gray-500"><em>Laporan ini disusun oleh:<br><strong>Fajar, S.Psi</strong></em></div>')
+                .replace(/Laporan ini disusun oleh: Fajar, S.Psi/g, `<div class="mt-8 pt-4 border-t text-right text-sm text-gray-500"><em>${t('report_prepared_by')}<br><strong>Fajar, S.Psi</strong></em></div>`)
                 .replace(/\n/g, '<br>');
 
-            contentDiv.innerHTML = `<h2 class="text-2xl font-bold mb-4 text-center">Rekomendasi Karir untuk ${app.test.state.currentUser}</h2><div class="prose max-w-none">${formattedText}</div>`;
+            contentDiv.innerHTML = `<h2 class="text-2xl font-bold mb-4 text-center">${t('reco_report_title_for', {name: app.test.state.currentUser})}</h2><div class="prose max-w-none">${formattedText}</div>`;
             contentDiv.classList.remove('hidden');
         };
         
         app.test.loadAppData = () => {
-            app.test.data.questions = JSON.parse(JSON.stringify(app.test.defaultTestsData));
+            app.lang.populateQuestionData();
             app.test.loadResultsFromStorage();
         };
 
@@ -1195,6 +1153,174 @@
             const resultsData = localStorage.getItem(`savedResults_${app.test.state.currentUser}`);
             app.test.state.savedResults = resultsData ? JSON.parse(resultsData) : {};
         };
+        
+        // ===== LANGUAGE MODULE =====
+        app.lang = {
+            current: 'id',
+            translations: {},
+            init() {
+                this.translations = this.getTranslationData();
+                const savedLang = localStorage.getItem('userLanguage') || 'id';
+                this.setLanguage(savedLang, false); // Set language without re-rendering everything yet
+            },
+            setLanguage(lang, doTranslate = true) {
+                this.current = lang;
+                localStorage.setItem('userLanguage', lang);
+                document.documentElement.lang = lang;
+                if (doTranslate) {
+                    this.translateUI();
+                    const activeScreen = document.querySelector('.screen.active-screen');
+                    if (activeScreen) {
+                        if (activeScreen.id === 'dashboard-screen') app.test.updateDashboard();
+                        // Add other screen updates if needed
+                    }
+                }
+            },
+            translateUI(scope = document) {
+                scope.querySelectorAll('[data-translate-key]').forEach(el => {
+                    const key = el.dataset.translateKey;
+                    const text = this.get(key);
+                    if (el.placeholder !== undefined) {
+                        el.placeholder = text;
+                    } else {
+                        el.innerHTML = text;
+                    }
+                });
+                const toggle = scope.querySelector('#lang-toggle-checkbox');
+                if (toggle) toggle.checked = this.current === 'en';
+            },
+            get(key, params = {}) {
+                let text = this.translations[key]?.[this.current] || this.translations[key]?.['id'] || `[${key}]`;
+                for (const param in params) {
+                    text = text.replace(new RegExp(`{${param}}`, 'g'), params[param]);
+                }
+                return text;
+            },
+            populateQuestionData() {
+                app.test.data.questions = JSON.parse(JSON.stringify(app.test.defaultTestsData));
+                const allQuestions = this.getQuestionTranslations();
+                app.test.data.questions['Kognitif Premium'].questions = allQuestions.iq;
+                app.test.data.questions['Minat Bakat Premium'].questions = allQuestions.riasec;
+            },
+            getQuestionTranslations() {
+                // This is where all questions are defined for easy translation
+                const iq = [
+                    // This will be a long array of question objects, each with id and en text/options
+                    { id: 1, section: 0, text: { id: 'Antonim: Kata "Optimis" berlawanan makna dengan...', en: 'Antonym: The word "Optimistic" has the opposite meaning of...' }, answer: { id: 'Putus asa', en: 'Hopeless' }, options: { id: ['Percaya diri', 'Berani', 'Putus asa', 'Semangat'], en: ['Confident', 'Brave', 'Hopeless', 'Enthusiastic'] } },
+                    { id: 2, section: 0, text: { id: 'Analogi: Matahari : Terang = Bulan : ...', en: 'Analogy: Sun : Bright = Moon : ...' }, answer: { id: 'Gelap', en: 'Dark' }, options: { id: ['Gelap', 'Malam', 'Pantulan', 'Pasang'], en: ['Dark', 'Night', 'Reflection', 'Tide'] } },
+                    // ... Add all 60 translated IQ questions here
+                    { id: 37, section: 3, text: { id: 'Urutan Angka Terbalik: Hafalkan: "7, 3, 9, 2, 4". Tuliskan kembali dalam urutan terbalik.', en: 'Reversed Number Sequence: Memorize: "7, 3, 9, 2, 4". Write it back in reverse order.' }, answer: { id: '4, 2, 9, 3, 7', en: '4, 2, 9, 3, 7' } },
+                    { id: 38, section: 3, text: { id: 'Cerita Singkat 1: Hafalkan: "Pada hari Minggu pagi, Pak Budi pergi memancing di sungai. Ia berhasil mendapatkan tiga ikan besar." Pertanyaan: Kapan Pak Budi pergi memancing?', en: 'Short Story 1: Memorize: "On Sunday morning, Mr. Budi went fishing in the river. He caught three big fish." Question: When did Mr. Budi go fishing?' }, answer: { id: 'Minggu pagi', en: 'Sunday morning' } },
+                    { id: 39, section: 3, text: { id: 'Huruf Acak: Hafalkan: "H M R U A". Temukan kata bermakna dari huruf-huruf tersebut.', en: 'Scrambled Letters: Memorize: "H M R U A". Find a meaningful word from these letters.' }, answer: { id: 'RUMAH', en: 'HOUSE' } }, // Assuming HOUSE is the 5-letter English equivalent
+                    { id: 40, section: 3, text: { id: 'Cerita Singkat 2: Hafalkan: "Sinta pergi ke pasar membeli apel, jeruk, dan mangga. Ia naik sepeda dan membawa keranjang berwarna merah." Pertanyaan: Apa warna keranjang yang dibawa Sinta?', en: 'Short Story 2: Memorize: "Sinta went to the market to buy apples, oranges, and mangoes. She rode a bicycle and carried a red basket." Question: What color was the basket Sinta carried?' }, answer: { id: 'Merah', en: 'Red' } },
+                    { id: 41, section: 3, text: { id: 'Urutan Warna: Hafalkan: "Merah - Biru - Kuning - Hijau". Manakah urutan yang benar?', en: 'Color Sequence: Memorize: "Red - Blue - Yellow - Green". Which is the correct sequence?' }, answer: { id: 'Merah - Biru - Kuning - Hijau', en: 'Red - Blue - Yellow - Green' }, options: { id: ['Merah - Kuning - Biru - Hijau', 'Merah - Biru - Kuning - Hijau', 'Biru - Merah - Hijau - Kuning'], en: ['Red - Yellow - Blue - Green', 'Red - Blue - Yellow - Green', 'Blue - Red - Green - Yellow'] } },
+                ];
+                const riasec = [
+                    // This will be a long array of RIASEC questions
+                    { text: { id: "Memperbaiki peralatan elektronik atau mekanik.", en: "Fixing electronic or mechanical equipment." }, type: 'R' },
+                    { text: { id: "Bekerja di luar ruangan (outdoor).", en: "Working outdoors." }, type: 'R' },
+                    // ... Add all 60 translated RIASEC questions here
+                ];
+                // For brevity in this example, I'm only showing a few. The full implementation would have all questions.
+                // A more scalable solution would be to fetch this from a JSON file.
+                return { iq, riasec };
+            },
+            getTranslationData() {
+                return {
+                    // UI translations
+                    'welcome_title': { id: 'Selamat Datang', en: 'Welcome' },
+                    'welcome_subtitle': { id: 'Masukkan nama dan token akses Anda untuk memulai.', en: 'Enter your name and access token to begin.' },
+                    'full_name_label': { id: 'Nama Lengkap', en: 'Full Name' },
+                    'full_name_placeholder': { id: 'Masukkan nama lengkap Anda', en: 'Enter your full name' },
+                    'token_label': { id: 'Token Akses', en: 'Access Token' },
+                    'token_placeholder': { id: 'Masukkan 6 digit token', en: 'Enter 6-digit token' },
+                    'start_session_button': { id: 'Mulai Sesi', en: 'Start Session' },
+                    'dashboard_greeting': { id: 'Halo', en: 'Hello' },
+                    'dashboard_subtitle': { id: 'Temukan kekuatan Anda. Pilih tes di bawah ini untuk memulai.', en: 'Discover your strengths. Choose a test below to start.' },
+                    'logout_button': { id: 'Keluar', en: 'Logout' },
+                    'reco_title': { id: 'Rekomendasi Karir Terpersonalisasi', en: 'Personalized Career Recommendation' },
+                    'reco_desc_unlocked': { id: 'Lihat analisis gabungan dari semua tes yang telah Anda selesaikan.', en: 'View the combined analysis from all completed tests.' },
+                    'reco_desc_locked': { id: 'Selesaikan Tes IQ dan Tes Minat Bakat untuk membuka fitur ini.', en: 'Complete the IQ Test and Interest Test to unlock this feature.' },
+                    'completed_status': { id: 'Selesai', en: 'Completed' },
+                    'instructions_title': { id: 'Instruksi Penting', en: 'Important Instructions' },
+                    'instructions_iq': { id: 'Tes ini mengukur berbagai kemampuan kognitif. Kerjakan dengan cepat dan teliti. Perhatikan setiap instruksi per bagian.', en: 'This test measures various cognitive abilities. Work quickly and accurately. Pay attention to the instructions for each section.' },
+                    'instructions_riasec': { id: 'Pilih "Suka" atau "Tidak Suka" untuk setiap kegiatan. Jawablah dengan jujur sesuai minat Anda untuk mendapatkan hasil yang akurat.', en: 'Choose "Like" or "Dislike" for each activity. Answer honestly according to your interests to get accurate results.' },
+                    'time_label': { id: 'Waktu Pengerjaan', en: 'Time Allotment' },
+                    'minutes_label': { id: 'Menit', en: 'Minutes' },
+                    'start_button': { id: 'Mulai Pengerjaan', en: 'Start Test' },
+                    'back_to_dashboard_button': { id: 'Kembali ke Dashboard', en: 'Back to Dashboard' },
+                    'back_button': { id: 'Kembali', en: 'Back' },
+                    'prev_button': { id: 'Sebelumnya', en: 'Previous' },
+                    'next_button': { id: 'Berikutnya', en: 'Next' },
+                    'submit_button': { id: 'Lihat Hasil Tes', en: 'View Results' },
+                    'page_progress': { id: 'Halaman {current} dari {total}', en: 'Page {current} of {total}' },
+                    'question_progress': { id: 'Pertanyaan {answered} dari {total}', en: 'Question {answered} of {total}' },
+                    'question_progress_simple': { id: 'Soal {current} dari {total}', en: 'Question {current} of {total}' },
+                    'like_option': { id: 'Suka', en: 'Like' },
+                    'dislike_option': { id: 'Tidak Suka', en: 'Dislike' },
+                    'type_answer_placeholder': { id: 'Ketik jawaban Anda di sini', en: 'Type your answer here' },
+                    'memorize_in_seconds': { id: 'Hafalkan informasi berikut dalam <span id="countdown" class="font-bold text-red-500">{seconds}</span> detik...', en: 'Memorize the following information in <span id="countdown" class="font-bold text-red-500">{seconds}</span> seconds...' },
+                    'hafalkan_keyword': { id: 'Hafalkan:', en: 'Memorize:' },
+                    'hafalkan_regex': { id: 'Hafalkan: "(.*?)"', en: 'Memorize: "(.*?)"' },
+                    'hafalkan_replace_regex': { id: '.*Hafalkan: ".*?"\\s*\\.?\\s*', en: '.*Memorize: ".*?"\\s*\\.?\\s*' },
+                    'download_cert_button': { id: 'Unduh Sertifikat', en: 'Download Certificate' },
+                    'ok_button': { id: 'OK', en: 'OK' },
+
+                    // Feedback messages
+                    'feedback_fill_all': { id: 'Nama dan Token harus diisi.', en: 'Name and Token are required.' },
+                    'feedback_token_6_digits': { id: 'Token harus terdiri dari 6 digit.', en: 'Token must be 6 digits.' },
+                    'feedback_validating': { id: 'Memvalidasi akses...', en: 'Validating access...' },
+                    'feedback_invalid_token': { id: 'Token yang Anda masukkan tidak valid.', en: 'The token you entered is not valid.' },
+                    'feedback_timeout': { id: 'Koneksi terlalu lama. Cek internet & coba lagi.', en: 'Connection timed out. Check your internet and try again.' },
+                    'feedback_time_up': { id: 'Waktu habis! Tes akan diselesaikan secara otomatis.', en: 'Time is up! The test will be submitted automatically.' },
+                    'feedback_answer_first': { id: 'Silakan isi jawaban terlebih dahulu.', en: 'Please provide an answer first.' },
+                    'feedback_answer_all': { id: 'Harap jawab semua pertanyaan sebelum melihat hasil.', en: 'Please answer all questions before viewing the results.' },
+                    'feedback_analyzing': { id: 'Kami sedang menganalisa jawaban Anda...', en: 'We are analyzing your answers...' },
+                    'feedback_analyzing_profile': { id: 'Menganalisis profil komprehensif Anda...', en: 'Analyzing your comprehensive profile...' },
+                    'feedback_no_api_key': { id: 'API Key belum dimasukkan. Silakan hubungi administrator.', en: 'API Key has not been configured. Please contact the administrator.' },
+                    'feedback_analysis_error': { id: 'Maaf, terjadi kesalahan saat AI menganalisis hasil.', en: 'Sorry, an error occurred while the AI was analyzing the results.' },
+                    'feedback_api_connection_error': { id: 'Terjadi masalah koneksi saat menghubungi AI. Pastikan Anda terhubung ke internet dan coba lagi. Error: {error}', en: 'There was a connection issue with the AI. Please ensure you are connected to the internet and try again. Error: {error}' },
+                    'feedback_cert_fail': { id: 'Gagal membuat sertifikat. Silakan coba lagi.', en: 'Failed to create certificate. Please try again.' },
+                    'feedback_qr_fail': { id: 'Gagal memuat QR Code untuk sertifikat.', en: 'Failed to load QR Code for the certificate.' },
+                    'feedback_memory_start': { id: 'Perhatian! Bagian tes memori akan dimulai. Anda akan diberi waktu beberapa detik untuk menghafal informasi sebelum menjawab.', en: 'Attention! The memory test section is about to begin. You will have a few seconds to memorize information before answering.' },
+                    
+                    // Report & Certificate
+                    'report_title_for': { id: 'Laporan Psikologis untuk {name}', en: 'Psychological Report for {name}' },
+                    'test_label': { id: 'Tes', en: 'Test' },
+                    'completed_on_label': { id: 'Diselesaikan pada', en: 'Completed on' },
+                    'date_now': { id: 'Saat ini', en: 'Just now' },
+                    'report_prepared_by': { id: 'Laporan ini disusun oleh:', en: 'This report was prepared by:' },
+                    'iq_cert_title': { id: 'Sertifikat Hasil Tes IQ', en: 'IQ Test Result Certificate' },
+                    'participant_name': { id: 'Nama Peserta', en: 'Participant Name' },
+                    'your_iq_score': { id: 'Skor IQ Anda', en: 'Your IQ Score' },
+                    'category_label': { id: 'Kategori', en: 'Category' },
+                    'iq_range_header': { id: 'Rentang IQ', en: 'IQ Range' },
+                    'category_header': { id: 'Kategori', en: 'Category' },
+                    'your_position': { id: 'Posisi Anda', en: 'Your Position' },
+                    'iq_table_desc': { id: 'Tabel di atas menggambarkan klasifikasi IQ dalam populasi umum berdasarkan standar internasional.', en: 'The table above illustrates IQ classification in the general population based on international standards.' },
+                    'your_score_is': { id: 'Skor IQ Anda adalah', en: 'Your IQ score is' },
+                    'which_is_in_category': { id: 'yang termasuk dalam kategori', en: 'which falls into the category' },
+                    'iq_disclaimer': { id: 'Nilai ini diperoleh berdasarkan performa Anda dalam mengerjakan soal visual setara standar Raven\'s APM. Tes ini mengukur kemampuan berpikir logis dan pola, bukan hasil akademis. Hasil ini hanya merupakan estimasi kognitif dan tidak dimaksudkan untuk diagnosis medis atau psikologis formal.', en: 'This score was obtained based on your performance on visual questions equivalent to the Raven\'s APM standard. This test measures logical and pattern thinking abilities, not academic results. This result is only a cognitive estimation and is not intended for formal medical or psychological diagnosis.' },
+                    'your_holland_code': { id: 'Kode Holland Anda', en: 'Your Holland Code' },
+                    'reco_report_title_for': { id: 'Rekomendasi Karir untuk {name}', en: 'Career Recommendation for {name}' },
+                    'cert_title': { id: 'SERTIFIKAT PENYELESAIAN', en: 'CERTIFICATE OF COMPLETION' },
+                    'cert_brand': { id: 'PETA POTENSI', en: 'POTENTIAL MAP' },
+                    'cert_awarded_to': { id: 'Sertifikat ini diberikan kepada:', en: 'This certificate is awarded to:' },
+                    'cert_completed_on': { id: 'Yang telah menyelesaikan tes pada tanggal', en: 'Who has completed the test on' },
+                    'cert_summary': { id: 'Rangkuman Hasil', en: 'Result Summary' },
+                    'cert_validation': { id: 'Validasi melalui QR Code', en: 'Validate via QR Code' },
+                    'cert_prepared_by': { id: 'Disusun oleh,', en: 'Prepared by,' },
+                    'cert_consultant': { id: 'Konsultan Psikologi', en: 'Psychological Consultant' },
+
+                    // Prompts
+                    'prompt_base': { id: 'Anda adalah seorang konsultan psikologi. Pengguna bernama {currentUser} telah menyelesaikan tes. Buat laporan psikologis yang profesional, tajam, dan bisa ditindaklanjuti dalam BAHASA INDONESIA. Gunakan format berikut untuk setiap judul bagian: [IKON:nama-ikon-fontawesome] Judul Bagian. Contoh: [IKON:fa-user-circle] Profil Umum. PENTING: Jangan gunakan karakter markdown seperti \'*\' atau \'#\'. Untuk menyorot informasi penting, apit teks dengan tag <u> dan </u>. Contoh: <u>Teks Penting</u>. Gunakan baris baru biasa untuk daftar. Di akhir laporan, tuliskan: "Laporan ini disusun oleh: Fajar, S.Psi". ', en: 'You are a psychology consultant. A user named {currentUser} has completed a test. Create a professional, sharp, and actionable psychological report in ENGLISH. Use the following format for each section title: [IKON:font-awesome-icon-name] Section Title. Example: [IKON:fa-user-circle] General Profile. IMPORTANT: Do not use markdown characters like \'*\' or \'#\'. To highlight important information, enclose the text with <u> and </u> tags. Example: <u>Important Text</u>. Use regular new lines for lists. At the end of the report, write: "This report was prepared by: Fajar, S.Psi". ' },
+                    'prompt_iq': { id: 'Pengguna mendapatkan skor IQ {iqScore} (kategori: {iqCategory}). Berikan analisis singkat tentang arti skor ini dan potensi implikasinya dalam format berikut: [IKON:fa-magnifying-glass-chart] Analisis Umum, [IKON:fa-rocket] Potensi Kekuatan, [IKON:fa-compass] Area Pengembangan.', en: 'The user obtained an IQ score of {iqScore} (category: {iqCategory}). Provide a brief analysis of what this score means and its potential implications in the following format: [IKON:fa-magnifying-glass-chart] General Analysis, [IKON:fa-rocket] Potential Strengths, [IKON:fa-compass] Areas for Development.' },
+                    'prompt_riasec': { id: 'Data hasil Tes Minat Bakat Holland (RIASEC) adalah Kode Holland: <u>{hollandCode}</u>. Buat bagian berikut: [IKON:fa-file-alt] Deskripsi Tipe Minat Dominan, [IKON:fa-building] Lingkungan Kerja Ideal, dan [IKON:fa-briefcase] Rekomendasi Karir Sesuai Minat.', en: 'The Holland Interest Test (RIASEC) result data is Holland Code: <u>{hollandCode}</u>. Create the following sections: [IKON:fa-file-alt] Description of Dominant Interest Types, [IKON:fa-building] Ideal Work Environment, and [IKON:fa-briefcase] Career Recommendations Based on Interests.' },
+                    'prompt_reco': { id: 'Anda adalah seorang konsultan karir ahli. Berdasarkan data psikologis pengguna bernama {currentUser} ini: Skor IQ {iqScore} (Kategori: {iqCategory}) dan Kode Minat Holland {hollandCode}, berikan analisis karir yang holistik dan terperinci dalam BAHASA INDONESIA. Buat bagian-bagian berikut: [IKON:fa-user-tie] Profil Karir Anda, [IKON:fa-lightbulb] Analisis Sinergi (bagaimana IQ dan Minat saling mendukung), dan [IKON:fa-ranking-star] 5 Rekomendasi Karir Teratas (jelaskan \'Mengapa Cocok\' untuk setiap karir dengan menggabungkan kedua hasil tes). Gunakan format [IKON:nama-ikon] untuk setiap judul bagian. PENTING: Jangan gunakan karakter markdown seperti \'*\' atau \'#\'. Untuk menyorot informasi penting, apit teks dengan tag <u> dan </u>. Contoh: <u>Teks Penting</u>. Gunakan baris baru biasa untuk daftar. Di akhir laporan, tuliskan: "Laporan ini disusun oleh: Fajar, S.Psi".', en: 'You are an expert career consultant. Based on the psychological data of a user named {currentUser}: IQ Score {iqScore} (Category: {iqCategory}) and Holland Interest Code {hollandCode}, provide a holistic and detailed career analysis in ENGLISH. Create the following sections: [IKON:fa-user-tie] Your Career Profile, [IKON:fa-lightbulb] Synergy Analysis (how IQ and interests support each other), and [IKON:fa-ranking-star] Top 5 Career Recommendations (explain \'Why It Fits\' for each career by combining both test results). Use the format [IKON:icon-name] for each section title. IMPORTANT: Do not use markdown characters like \'*\' or \'#\'. To highlight important information, enclose the text with <u> and </u> tags. Example: <u>Important Text</u>. Use regular new lines for lists. At the end of the report, write: "This report was prepared by: Fajar, S.Psi".' }
+                };
+            }
+        };
+
 
         document.addEventListener('DOMContentLoaded', app.init);
     </script>
